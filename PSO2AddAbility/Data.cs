@@ -10,25 +10,33 @@ namespace PSO2AddAbility
         //-------------------------------------------------------------------------------
         #region +[static]GetMaterialAbilities
         //-------------------------------------------------------------------------------
-        public static IEnumerable<IAbility> GetMaterialAbilities(IAbility ability)
+        public static IEnumerable<IEnumerable<IAbility>> GetMaterialAbilities(IAbility ability)
         {
             if (ability is Basic_up || ability is Additional || ability is Regist) {
-                int level = ((ILevel)ability).Level;
+                // (元の能力*1,2,3) or (一つ下の能力*2,3)
+                yield return new[] { ability };
+                yield return new[] { ability, ability };
+                yield return new[] { ability, ability, ability };
 
+                int level = ((ILevel)ability).Level;
                 IAbility ab = Activator.CreateInstance(ability.GetType(), level - 1) as IAbility;
-                yield return ab;
+                yield return new[] { ab, ab };
+                yield return new[] { ab, ab, ab };
             }
             else if (ability is Ability) {
-                int level = ((ILevel)ability).Level;
+                // (元の能力*1,2,3) or (パワー,シュート,テクニック各1)
+                yield return new[] { ability };
+                yield return new[] { ability, ability };
+                yield return new[] { ability, ability, ability };
 
-                yield return new パワー(level);
-                yield return new シュート(level);
-                yield return new テクニック(level);
+                int level = ((ILevel)ability).Level;
+                yield return new IAbility[] { new パワー(level), new シュート(level), new テクニック(level) };
             }
             else if (ability is Soul || ability is Special_up) {
+                // (元の能力*2,3)
                 IAbility ab = Activator.CreateInstance(ability.GetType()) as IAbility;
-                yield return ab;
-                yield return ab;
+                yield return new[] { ab, ab };
+                yield return new[] { ab, ab, ab };
             }
 
             yield break;
