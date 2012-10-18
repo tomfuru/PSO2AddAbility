@@ -56,6 +56,15 @@ namespace PSO2AddAbility
 
 
                 // 3本，(目的能力数)-1の合成で行う場合
+                foreach (var co in Assignments(3, num_slot - 1, elements)) {
+
+                    // TODO:目標武器に目標能力がついていたら意味がない
+                    // TODO:2本目と3本目は区別しない
+                    Console.WriteLine("---");
+                    foreach (var ab in co) {
+                       Console.WriteLine( ab.abilities.AllToString());
+                    }
+                }
 
                 // 3本，(目的能力数)の合成で行う場合
 
@@ -87,7 +96,7 @@ namespace PSO2AddAbility
         #region -Assignments 特殊能力の振り分けリスト
         //-------------------------------------------------------------------------------
         //
-        private static IEnumerable<int> Assignments(int weapon_num, int slot_num, List<AbilityInfo> elements)
+        private static IEnumerable<Weapon[]> Assignments(int weapon_num, int slot_num, List<AbilityInfo> elements)
         {
             if (weapon_num != 2 && weapon_num != 3) { throw new NotSupportedException("武器の個数は2個か3個のみ"); }
 
@@ -97,15 +106,31 @@ namespace PSO2AddAbility
             int[][][] combinations = COMBINATION[weapon_num];
 
             // { {{0},{1}}, {{0,1}} } => { {{0}, {0,1}}, {{1}, {0,1}} }
-            //var list = ListCombinations<IEnumerable<int>>(elements.Select(ai => combinations[ai.Num]).ToArray());
+            var elementsNums = elements.Select(ai => combinations[ai.Num]).ToArray();
+            var list = ListCombinations(elementsNums);
 
-            //foreach (var combination in list) {
-            //    combination
-            //}
+            foreach (var combination in list) {
+                var elemIndicieslist = elements.Zip(combination, (ai, comb) => Tuple.Create(ai.Ability, comb));
+                Weapon[] weapons = new Weapon[weapon_num];
+                for (int i = 0; i < weapon_num; i++) {
+                    weapons[i] = new Weapon();
+                    weapons[i].abilities = elemIndicieslist.Select(tuple => (tuple.Item2.Contains(i)) ? tuple.Item1 : new ゴミ()).ToArray();
+                }
 
-            throw new NotImplementedException();
+                yield return weapons;
+            }
         }
         #endregion (Assignments)
+
+        //-------------------------------------------------------------------------------
+        #region IsBasicWeapon
+        //-------------------------------------------------------------------------------
+        //
+        public static bool IsBasicWeapon(Weapon weapon)
+        {
+            return false;
+        }
+        #endregion (IsBasicWeapon)
 
         //-------------------------------------------------------------------------------
         #region ListCombinations 組み合わせを列挙

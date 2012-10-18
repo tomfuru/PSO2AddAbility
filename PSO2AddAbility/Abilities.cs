@@ -10,7 +10,7 @@ namespace PSO2AddAbility
         public IAbility[] abilities;
     }
 
-    public class ゴミ : IAbility { }
+    public class ゴミ : ToStringC, IAbility { }
 
     public class パワー : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ファング・ソール> { public パワー(int lv) { Level = lv; } }
     public class シュート : Basic_up, IMutationAmplifiable, ISoulAmplifiable<マイザー・ソール> { public シュート(int lv) { Level = lv; } }
