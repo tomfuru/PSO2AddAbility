@@ -20,8 +20,16 @@ namespace PSO2AddAbility
         private void button1_Click(object sender, EventArgs e)
         {
             Weapon w = new Weapon();
-            w.abilities = new IAbility[] { new パワー(3), new ヴォル・ソール(), new アビリティ(3)};
+            w.abilities = new IAbility[] { パワー.GetLv(3), ヴォル・ソール.Get(), アビリティ.GetLv(3), アーム.GetLv(3)};
             Synthesis.Synthesize(w);
+        }
+
+        class aaa
+        {
+            public aaa()
+            {
+
+            }
         }
     }
 }

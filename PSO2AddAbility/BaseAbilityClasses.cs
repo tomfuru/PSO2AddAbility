@@ -7,15 +7,15 @@ namespace PSO2AddAbility
 {
 
     /// <summary>能力UP</summary>
-    public abstract class Basic_up : ToStringC, IWeapon, IUnit, ILevel, Inheritable { public int Level { get; protected set; } }
+    public abstract class Basic_up : ToStringC, IWeapon, IUnit, ILevel, Inheritable { public int Level { get; protected set; } public abstract IAbility GetInstanceOfLv(int lv); }
     /// <summary>追加効果</summary>
-    public abstract class Additional : ToStringC, IWeapon, ILevel, Inheritable { public int Level { get; protected set; } }
+    public abstract class Additional : ToStringC, IWeapon, ILevel, Inheritable { public int Level { get; protected set; } public abstract IAbility GetInstanceOfLv(int lv); }
     /// <summary>○○・ブースト</summary>
     public abstract class Boost : ToStringC, IWeapon, IUnit { }
     /// <summary>アビリティ</summary>
-    public abstract class Ability : ToStringC, IWeapon, IUnit, ILevel { public int Level { get; protected set; } }
+    public abstract class Ability : ToStringC, IWeapon, IUnit, ILevel { public int Level { get; protected set; } public abstract IAbility GetInstanceOfLv(int lv); }
     /// <summary>○○レジスト</summary>
-    public abstract class Regist : ToStringC, IUnit, ILevel, Inheritable { public int Level { get; protected set; } }
+    public abstract class Regist : ToStringC, IWeapon, IUnit, ILevel, Inheritable { public int Level { get; protected set; } public abstract IAbility GetInstanceOfLv(int lv); }
     /// <summary>ミューテーションⅠ，スティグマ</summary>
     public abstract class Special_up : ToStringC, IWeapon, IUnit, Inheritable { }
     /// <summary>○○・ソール</summary>
@@ -66,7 +66,7 @@ namespace PSO2AddAbility
     public interface IAbility { }
 
     /// <summary>LVがある</summary>
-    public interface ILevel { int Level { get; } }
+    public interface ILevel { int Level { get; } IAbility GetInstanceOfLv(int lv); }
 
     /// <summary>ミューテーションⅠで能力が上がる</summary>
     public interface IMutationAmplifiable { }

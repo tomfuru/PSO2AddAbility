@@ -39,8 +39,10 @@ namespace PSO2AddAbility
                     IAbility[] elemarray = elem.ToArray();
                     IAbility[] distinct = elem.Distinct().ToArray();
                     foreach (var element in distinct) {
-                        int num = elemarray.Count(el => el.GetType().Equals(element.GetType()));
-                        int index = elements.FindIndex(ai => ai.Ability.GetType().Equals(element.GetType()));
+                        //int num = elemarray.Count(el => el.GetType().Equals(element.GetType()));
+                        //int index = elements.FindIndex(ai => ai.Ability.GetType().Equals(element.GetType()));
+                        int num = elemarray.Count(el => el == element);
+                        int index = elements.FindIndex(ai => ai.Ability == element);
 
                         // 既に入っている場合はその分入れなくてよい(例:アビリティⅢの素材のパワーⅢと、パワーⅢの素材のパワーⅢは重複可能)
                         if (index >= 0) {
@@ -54,23 +56,45 @@ namespace PSO2AddAbility
                 elements.Sort((el1, el2) => -el1.Num.CompareTo(el2.Num));
                 int num_elements = elements.Sum(ai => ai.Num);
 
+                /*
+                var a1 = Assignments(3, num_slot, elements).ToArray();
+                var a2 = Assignments(3, num_slot - 1, elements).ToArray();
+                var a3 = Assignments(2, num_slot, elements).ToArray();
+                var a4 = Assignments(2, num_slot - 1, elements).ToArray();
+                */
+
+                // 3本，(目的能力数)の合成で行う場合
+                foreach (var co in Assignments(3, num_slot, elements)) {
+                    if (objective.Equals(co.ElementAt(0))) { continue; } // 目標武器に目標能力がついていたら意味がない
+                    /*
+                    // デバッグ用表示
+                    Console.WriteLine("---");
+                    foreach (var ab in co) {
+                        Console.WriteLine(ab.abilities.AllToString());
+                    }
+                    */
+
+                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
+
+
+                }
+
 
                 // 3本，(目的能力数)-1の合成で行う場合
                 foreach (var co in Assignments(3, num_slot - 1, elements)) {
-
-                    // TODO:目標武器に目標能力がついていたら意味がない
-                    // TODO:2本目と3本目は区別しない
-                    Console.WriteLine("---");
-                    foreach (var ab in co) {
-                       Console.WriteLine( ab.abilities.AllToString());
-                    }
+                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
                 }
 
-                // 3本，(目的能力数)の合成で行う場合
+                // 2本，(目的能力数)の合成で行う場合
+                foreach (var co in Assignments(2, num_slot, elements)) {
+                    if (objective.Equals(co.ElementAt(0))) { continue; } // 目標武器に目標能力がついていたら意味がない
+                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
+                }
 
                 // 2本，(目的能力数)-1の合成で行う場合
-
-                // 2本，(目的能力数)の合成で行う場合
+                foreach (var co in Assignments(2, num_slot - 1, elements)) {
+                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
+                }
 
             }
 
@@ -105,20 +129,30 @@ namespace PSO2AddAbility
 
             int[][][] combinations = COMBINATION[weapon_num];
 
-            // { {{0},{1}}, {{0,1}} } => { {{0}, {0,1}}, {{1}, {0,1}} }
+            // { {{0},{1}}, {{0,1}} } => { {{0}, {0,1}}, {{1}, {0,1}} } の左辺部分(それぞれの属性のつき方のありうる組み合わせの集合)
             var elementsNums = elements.Select(ai => combinations[ai.Num]).ToArray();
+            // すべての属性の付き方の組み合わせの列挙
             var list = ListCombinations(elementsNums);
+            // 要素インデックス(引数のリストの)に関連付け
+            var elemIndicieslists = list.Select(combination => Enumerable.Range(0, elements.Count).Zip(combination, (index, comb) => Tuple.Create(index, comb)));
+            // (要素インデックス->武器インデックスリスト)のリストを(武器インデックス->要素インデックスリスト)のリストに
+            var weapon_elements_list = elemIndicieslists.Select(eilist => Enumerable.Range(0, weapon_num).Select(i => eilist.Where(tuple => tuple.Item2.Contains(i)).Select(tuple => tuple.Item1).ToArray()).ToArray());
+            // 2本目と3本目は区別しない
+            var weapon_elements_list_distinct =
+                (weapon_num == 2) ? weapon_elements_list :
+                                    weapon_elements_list.Distinct((left, right) => left[1].Length == right[2].Length && left[1].All(i => right[2].Contains(i))
+                                                                                && right[1].Length == left[2].Length && right[1].All(i => left[2].Contains(i)));
+            // 一つの武器への割り当てが多すぎるものを排除
+            var weapon_elements_list_m = weapon_elements_list_distinct.Where(we => we.All(weaponElems => weaponElems.Length <= slot_num));
 
-            foreach (var combination in list) {
-                var elemIndicieslist = elements.Zip(combination, (ai, comb) => Tuple.Create(ai.Ability, comb));
-                Weapon[] weapons = new Weapon[weapon_num];
-                for (int i = 0; i < weapon_num; i++) {
-                    weapons[i] = new Weapon();
-                    weapons[i].abilities = elemIndicieslist.Select(tuple => (tuple.Item2.Contains(i)) ? tuple.Item1 : new ゴミ()).ToArray();
-                }
+            var weaponslist = weapon_elements_list_m.Select(indicieslist =>
+                                   indicieslist.Select(indicies =>
+                                       new Weapon { abilities = indicies.Select(index => elements[index].Ability)
+                                                                        .Concat(Enumerable.Repeat(ゴミ.Get(), slot_num - indicies.Length)).ToArray() }
+                                    ).ToArray()
+                                );
 
-                yield return weapons;
-            }
+            foreach (var item in weaponslist) { yield return item; }
         }
         #endregion (Assignments)
 

@@ -18,8 +18,11 @@ namespace PSO2AddAbility
                 yield return new[] { ability, ability };
                 yield return new[] { ability, ability, ability };
 
-                int level = ((ILevel)ability).Level;
-                IAbility ab = Activator.CreateInstance(ability.GetType(), level - 1) as IAbility;
+                ILevel ability_l = ability as ILevel;
+                int level = ability_l.Level;
+
+                //IAbility ab = Activator.CreateInstance(ability.GetType(), level - 1) as IAbility; 下に代替
+                IAbility ab = ability_l.GetInstanceOfLv(level - 1);
                 yield return new[] { ab, ab };
                 yield return new[] { ab, ab, ab };
             }
@@ -30,13 +33,12 @@ namespace PSO2AddAbility
                 yield return new[] { ability, ability, ability };
 
                 int level = ((ILevel)ability).Level;
-                yield return new IAbility[] { new パワー(level), new シュート(level), new テクニック(level) };
+                yield return new IAbility[] { パワー.GetLv(level), シュート.GetLv(level), テクニック.GetLv(level) };
             }
             else if (ability is Soul || ability is Special_up) {
                 // (元の能力*2,3)
-                IAbility ab = Activator.CreateInstance(ability.GetType()) as IAbility;
-                yield return new[] { ab, ab };
-                yield return new[] { ab, ab, ab };
+                yield return new[] { ability, ability };
+                yield return new[] { ability, ability, ability };
             }
 
             yield break;
@@ -45,28 +47,28 @@ namespace PSO2AddAbility
         #endregion (+[static]GetMaterialAbilities)
 
         public static readonly IAbility[] ALL_ABILITIES = {
-            new パワー(0), new シュート(0), new テクニック(0), 
-            new ボディ(0), new リアクト(0), new マインド(0), 
-            new アーム(0), new スタミナ(0), new スピリタ(0),
+            パワー.GetLv(1), シュート.GetLv(1), テクニック.GetLv(1), 
+            ボディ.GetLv(1),  リアクト.GetLv(1), マインド.GetLv(1), 
+            アーム.GetLv(1), スタミナ.GetLv(1), スピリタ.GetLv(1),
 
-            new ミューテーションⅠ(),
-            new ヴォル・ソール(), new グワナ・ソール(), new クォーツ・ソール(), 
-            new ランサ・ソール(), new ファング・ソール(), new マイザー・ソール(),
-            new ラグネ・ソール(), 
-            new シグノ・ソール(), new ラッピー・ソール(), 
-            new スノウ・ソール(), new ロックベア・ソール(), 
-            new マルモ・ソール(), new ヴァーダー・ソール(), 
-            new キャタ・ソール(),
+            ミューテーションⅠ.Get(),
+            ヴォル・ソール.Get(), グワナ・ソール.Get(), クォーツ・ソール.Get(), 
+            ランサ・ソール.Get(), ファング・ソール.Get(), マイザー・ソール.Get(),
+            ラグネ・ソール.Get(), 
+            シグノ・ソール.Get(), ラッピー・ソール.Get(), 
+            スノウ・ソール.Get(), ロックベア・ソール.Get(), 
+            マルモ・ソール.Get(), ヴァーダー・ソール.Get(), 
+            キャタ・ソール.Get(),
 
-            new スタミナ・ブースト(), new スピリタ・ブースト(),
+            スタミナ・ブースト.Get(), スピリタ・ブースト.Get(),
 
-            new アビリティ(0),
+            アビリティ.GetLv(1),
 
-            new バーン(0), new フリーズ(0), new ショック(0), 
-            new ミラージュ(0), new パニック(0), new ポイズン(0),
-            new ブロウレジスト(0), new ショットレジスト(0), new マインドレジスト(0),
-            new フレイムレジスト(0), new アイスレジスト(0), new ショックレジスト(0), 
-            new ウィンドレジスト(0), new ライトレジスト(0), new グルームレジスト(0)
+            バーン.GetLv(1), フリーズ.GetLv(1), ショック.GetLv(1), 
+            ミラージュ.GetLv(1), パニック.GetLv(1), ポイズン.GetLv(1),
+            ブロウレジスト.GetLv(1), ショットレジスト.GetLv(1), マインドレジスト.GetLv(1),
+            フレイムレジスト.GetLv(1), アイスレジスト.GetLv(1), ショックレジスト.GetLv(1), 
+            ウィンドレジスト.GetLv(1), ライトレジスト.GetLv(1), グルームレジスト.GetLv(1)
         };
 
         const int GEN = 0;
