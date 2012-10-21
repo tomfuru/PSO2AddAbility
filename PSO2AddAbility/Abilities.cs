@@ -21,14 +21,14 @@ namespace PSO2AddAbility
             return abilities.AllToString();
         }
     }
-
+    //-------------------------------------------------------------------------------
     public class ゴミ : ToStringC, IAbility
     {
         private ゴミ() { }
         private static ゴミ value = new ゴミ();
         public static ゴミ Get() { return value; }
     }
-
+    //-------------------------------------------------------------------------------
     public class パワー : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ファング・ソール>
     {
         private パワー(int lv) { Level = lv; }
@@ -92,7 +92,7 @@ namespace PSO2AddAbility
         public static スピリタ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
     }
-
+    //-------------------------------------------------------------------------------
     public class バーン : Additional, IMutationAmplifiable, ISoulAmplifiable<ヴォル・ソール>
     {
         public バーン(int lv) { Level = lv; }
@@ -135,7 +135,7 @@ namespace PSO2AddAbility
         public static ポイズン GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
     }
-
+    //-------------------------------------------------------------------------------
     public class ブロウレジスト : Regist, IMutationAmplifiable
     {
         public ブロウレジスト(int lv) { Level = lv; }
@@ -200,7 +200,7 @@ namespace PSO2AddAbility
         public static グルームレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
     }
-
+    //-------------------------------------------------------------------------------
     public class アビリティ : Ability
     {
         public アビリティ(int lv) { Level = lv; }
@@ -208,7 +208,7 @@ namespace PSO2AddAbility
         public static アビリティ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
     }
-
+    //-------------------------------------------------------------------------------
     public class スタミナ・ブースト : Boost
     {
         private スタミナ・ブースト() { }
@@ -221,7 +221,7 @@ namespace PSO2AddAbility
         private static スピリタ・ブースト value = new スピリタ・ブースト();
         public static スピリタ・ブースト Get() { return value; }
     }
-
+    //-------------------------------------------------------------------------------
     public class ミューテーションⅠ : Special_up
     {
         private ミューテーションⅠ() { }
@@ -234,6 +234,7 @@ namespace PSO2AddAbility
         private static スティグマ value = new スティグマ();
         public static スティグマ Get() { return value; }
     }
+    //-------------------------------------------------------------------------------
     public class ヴォル・ソール : Soul
     {
         private ヴォル・ソール() { }

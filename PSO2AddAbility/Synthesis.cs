@@ -5,8 +5,23 @@ using System.Text;
 
 namespace PSO2AddAbility
 {
-    public static class Synthesis
+    public class WeaponSynthesisInfo
     {
+        public Weapon Weapon;
+        public SynthesisWeapons[] SynthesisInfo;
+    }
+
+    public class SynthesisWeapons
+    {
+        public WeaponSynthesisInfo info0;
+        public WeaponSynthesisInfo info1;
+        public WeaponSynthesisInfo info2;
+    }
+
+    public class Synthesis
+    {
+        private Synthesis() { }
+
         private class AbilityInfo
         {
             public IAbility Ability;
@@ -18,12 +33,20 @@ namespace PSO2AddAbility
             }
         }
 
+        private static Dictionary<Weapon, SynthesisWeapons[]> winfo_cache = new Dictionary<Weapon, SynthesisWeapons[]>();
         //-------------------------------------------------------------------------------
         #region +Synthesize
         //-------------------------------------------------------------------------------
         //
-        public static void Synthesize(Weapon objective)
+        public static SynthesisWeapons[] Synthesize(Weapon objective, bool isMaterial)
         {
+            if (winfo_cache.ContainsKey(objective)) {
+                return winfo_cache[objective];
+            }
+            else if (IsBasicWeapon(objective)) {
+                return null;
+            }
+
             int num_slot = objective.abilities.Length;
             // 必要な素材能力の候補リストを取得
             var need_materials = objective.abilities.Select(ab => Data.GetMaterialAbilities(ab)).ToArray();
@@ -32,6 +55,8 @@ namespace PSO2AddAbility
             // 候補->全能力[全能力->1能力の必要能力[1能力の必要能力->能力]]
             List<IEnumerable<IEnumerable<IAbility>>> combinations = ListCombinations(need_materials);
 
+
+            List<SynthesisWeapons> sw_list = new List<SynthesisWeapons>();
             // 各素材の組み合わせについて合成方法を調べる
             foreach (var combination in combinations) {
                 List<AbilityInfo> elements = new List<AbilityInfo>(); // 必要特殊能力リスト
@@ -63,9 +88,33 @@ namespace PSO2AddAbility
                 var a4 = Assignments(2, num_slot - 1, elements).ToArray();
                 */
 
+
                 // 3本，(目的能力数)の合成で行う場合
                 foreach (var co in Assignments(3, num_slot, elements)) {
-                    if (objective.Equals(co.ElementAt(0))) { continue; } // 目標武器に目標能力がついていたら意味がない
+                    if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
+                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; }
+                   
+                    WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() { 
+                        Weapon = co[0],
+                        SynthesisInfo = (IsBasicWeapon(co[0])) ? null : Synthesize(co[0], false)
+                    };
+                    WeaponSynthesisInfo info1 = new WeaponSynthesisInfo() { 
+                        Weapon = co[1],
+                        SynthesisInfo = (IsBasicWeapon(co[1])) ? null : Synthesize(co[1], true)
+                    };
+                    WeaponSynthesisInfo info2 = new WeaponSynthesisInfo() { 
+                        Weapon = co[2],
+                        SynthesisInfo = (IsBasicWeapon(co[2])) ? null : Synthesize(co[2], true)
+                    };
+
+                    SynthesisWeapons sw = new SynthesisWeapons() {
+                        info0 = info0,
+                        info1 = info1,
+                        info2 = info2
+                    };
+
+                    sw_list.Add(sw);
+
                     /*
                     // デバッグ用表示
                     Console.WriteLine("---");
@@ -80,6 +129,7 @@ namespace PSO2AddAbility
                 }
 
 
+                /*
                 // 3本，(目的能力数)-1の合成で行う場合
                 foreach (var co in Assignments(3, num_slot - 1, elements)) {
                     // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
@@ -95,8 +145,15 @@ namespace PSO2AddAbility
                 foreach (var co in Assignments(2, num_slot - 1, elements)) {
                     // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
                 }
-
+                */
             }
+
+            SynthesisWeapons[] ret = sw_list.ToArray();
+            if (!winfo_cache.ContainsKey(objective)) {
+                winfo_cache.Add(objective, ret);
+            }
+
+            return ret;
 
         }
         #endregion (Synthesize)
@@ -147,8 +204,10 @@ namespace PSO2AddAbility
 
             var weaponslist = weapon_elements_list_m.Select(indicieslist =>
                                    indicieslist.Select(indicies =>
-                                       new Weapon { abilities = indicies.Select(index => elements[index].Ability)
-                                                                        .Concat(Enumerable.Repeat(ゴミ.Get(), slot_num - indicies.Length)).ToArray() }
+                                       new Weapon {
+                                           abilities = indicies.Select(index => elements[index].Ability)
+                                                               .Concat(Enumerable.Repeat(ゴミ.Get(), slot_num - indicies.Length)).ToArray()
+                                       }
                                     ).ToArray()
                                 );
 
@@ -157,11 +216,15 @@ namespace PSO2AddAbility
         #endregion (Assignments)
 
         //-------------------------------------------------------------------------------
-        #region IsBasicWeapon
+        #region +IsBasicWeapon
         //-------------------------------------------------------------------------------
         //
         public static bool IsBasicWeapon(Weapon weapon)
         {
+            int garbage_num = weapon.abilities.Count(ab => ab is ゴミ);
+
+            if (garbage_num >= weapon.abilities.Length - 1) { return true; }
+
             return false;
         }
         #endregion (IsBasicWeapon)

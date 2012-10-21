@@ -21,10 +21,12 @@ namespace PSO2AddAbility
                 ILevel ability_l = ability as ILevel;
                 int level = ability_l.Level;
 
-                //IAbility ab = Activator.CreateInstance(ability.GetType(), level - 1) as IAbility; 下に代替
-                IAbility ab = ability_l.GetInstanceOfLv(level - 1);
-                yield return new[] { ab, ab };
-                yield return new[] { ab, ab, ab };
+                if (level > 1) {
+                    //IAbility ab = Activator.CreateInstance(ability.GetType(), level - 1) as IAbility; 下に代替
+                    IAbility ab = ability_l.GetInstanceOfLv(level - 1);
+                    yield return new[] { ab, ab };
+                    yield return new[] { ab, ab, ab };
+                }
             }
             else if (ability is Ability) {
                 // (元の能力*1,2,3) or (パワー,シュート,テクニック各1)
