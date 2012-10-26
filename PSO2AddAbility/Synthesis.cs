@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -73,9 +74,9 @@ namespace PSO2AddAbility
                 return null;
             }
 
-            int num_slot = objective.abilities.Length;
+            int num_slot = objective.AbilityNum;
             // 必要な素材能力の候補リストを取得
-            var need_materials = objective.abilities.Select(ab => Data.GetMaterialAbilities(ab)).ToArray();
+            var need_materials = objective.Select(ab => Data.GetMaterialAbilities(ab)).ToArray();
 
             // 1能力に必要な能力が複数ある(パワーⅢはパワーⅡ*2でも3でも作れる等)ため，それらの候補のすべての組み合わせリストを取得
             // 候補->全能力[全能力->1能力の必要能力[1能力の必要能力->能力]]
@@ -118,8 +119,10 @@ namespace PSO2AddAbility
                 // 3本，(目的能力数)の合成で行う場合
                 foreach (var co in Assignments(3, num_slot, elements)) {
                     if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
-                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; }
-                   
+                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
+
+                    GetProbabilities(objective, co[0], co[1], co[2]);
+
                     WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() { 
                         Weapon = co[0],
                         SynthesisInfo = (IsBasicWeapon(co[0])) ? null : Synthesize(co[0], false)
@@ -148,10 +151,6 @@ namespace PSO2AddAbility
                         Console.WriteLine(ab.abilities.AllToString());
                     }
                     */
-
-                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
-
-
                 }
 
 
@@ -215,10 +214,8 @@ namespace PSO2AddAbility
 
             var weaponslist = weapon_elements_list_m.Select(indicieslist =>
                                    indicieslist.Select(indicies =>
-                                       new Weapon {
-                                           abilities = indicies.Select(index => elements[index].Ability)
-                                                               .Concat(Enumerable.Repeat(ゴミ.Get(), slot_num - indicies.Length)).ToArray()
-                                       }
+                                       new Weapon(indicies.Select(index => elements[index].Ability)
+                                                               .Concat(Enumerable.Repeat(ゴミ.Get(), slot_num - indicies.Length)).ToArray())
                                     ).ToArray()
                                 );
 
@@ -232,9 +229,9 @@ namespace PSO2AddAbility
         //
         public static bool IsBasicWeapon(Weapon weapon)
         {
-            int garbage_num = weapon.abilities.Count(ab => ab is ゴミ);
+            int garbage_num = weapon.Count(ab => ab is ゴミ);
 
-            if (garbage_num >= weapon.abilities.Length - 1) { return true; }
+            if (garbage_num >= weapon.AbilityNum - 1) { return true; }
 
             return false;
         }
@@ -274,25 +271,61 @@ namespace PSO2AddAbility
         #endregion (ListCombinations)
 
         //-------------------------------------------------------------------------------
+        #region +GetProbabilities
+        //-------------------------------------------------------------------------------
+        /// <summary>
+        /// 全能力についての能力付加確率を返す(EXTRA補正込み)
+        /// </summary>
+        /// <returns></returns>
+        public static float[] GetProbabilities(Weapon objective, Weapon weapon1, Weapon weapon2, Weapon weapon3 = null)
+        {
+            int num_material_obj = objective.AbilityNum;
+            int num_material_mat = weapon1.AbilityNum;
+            int weapon_num = (weapon3 == null) ? 2 : 3;
+            float correction_extra = (num_material_obj == num_material_mat) ? 1.00f : Data.PROB_CORRECTION_EXTRA[num_material_mat, weapon_num];
+
+            return objective.Select(ab => GetProbability(ab, weapon1, weapon2, weapon3) * correction_extra).ToArray();
+        }
+        #endregion (GetProbabilities)
+        //-------------------------------------------------------------------------------
         #region +GetProbability
         //-------------------------------------------------------------------------------
-        //
+        /// <summary>
+        /// 1能力についての能力付加確率を返す(EXTRA補正無し)
+        /// </summary>
+        /// <returns></returns>
         public static float GetProbability(IAbility objective, Weapon weapon1, Weapon weapon2, Weapon weapon3 = null)
         {
+            IEnumerable<Weapon> weapons = (new Weapon[] { weapon1, weapon2, weapon3 }).Where(w => w != null);
+            if (objective is Boost) { return 1.00f; }
+            if (objective is Soul || objective is Special_up) {
+                int num = weapons.Count(weapon =>  weapon.ContainsAbility(objective));
+                return Data.PROB_SOUL[Data.INH[num]];
+            }
+            else if (objective is Ability) {
+                
+            }
+            else if (objective is Basic_up || objective is Additional) {
+                ILevel ab_lv = objective as ILevel;
+                bool mutation_amp = (objective is IMutationAmplifiable) && weapons.Any(weapon => weapon.ContainsAbility(ミューテーションⅠ.Get()));
+                //bool soul_amp = weapons.Any(weapon => weapon.Any(ab => ab is Soul && )));
+                
+                    
+                float[,] prob_table = (objective is Basic_up) ? Data.PROB_NORMAL_BASIC : Data.PROB_NORMAL_ADDITIONAL;
 
-            throw new NotImplementedException();
+                int inh_num = weapons.Count(weapon => weapon.ContainsAbility(objective));
+                float inh_prob = (inh_num >= 1) ? prob_table[ab_lv.Level, Data.INH[inh_num]] : 0.0f;
+
+                IAbility gen_ab = ab_lv.GetInstanceOfLv(ab_lv.Level - 1);
+                int gen_num = weapons.Count(weapon => weapon.ContainsAbility(gen_ab));
+                float gen_prob = (gen_num >= 2) ? prob_table[ab_lv.Level - 1, Data.GEN[gen_num]] : 0.0f;
+
+                return Math.Max(inh_prob, gen_prob);
+            }
+
+            return 0.0f;
         }
         #endregion (GetProbability)
 
-        //-------------------------------------------------------------------------------
-        #region +GetProbabilities
-        //-------------------------------------------------------------------------------
-        //
-        public static float[] GetProbabilities(Weapon objective, Weapon weapon1, Weapon weapon2, Weapon weapon3 = null)
-        {
-
-            throw new NotImplementedException();
-        }
-        #endregion (GetProbabilities)
     }
 }

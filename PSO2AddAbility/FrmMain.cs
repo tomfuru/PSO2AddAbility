@@ -19,15 +19,11 @@ namespace PSO2AddAbility
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //Weapon w = new Weapon();
-            //w.abilities = new IAbility[] { パワー.GetLv(3), ヴォル・ソール.Get(), アビリティ.GetLv(3), アーム.GetLv(3) };
-            //var result = Synthesis.Synthesize(w, false);
-            //displayWeaponSynthesis(w, result);
-
-            Weapon w1 = new Weapon();
-            w1.abilities = new IAbility[] { パワー.GetLv(3), アーム.GetLv(3) };
-            var result1 = Synthesis.Synthesize(w1, false);
-            displayWeaponSynthesisDynamically_first(w1, result1);
+            //Weapon w = new Weapon(パワー.GetLv(3), ヴォル・ソール.Get(), アビリティ.GetLv(3), アーム.GetLv(3));
+            //Weapon w = new Weapon(パワー.GetLv(3), アーム.GetLv(3));
+            Weapon w = new Weapon(パワー.GetLv(3), ファング・ソール.Get());
+            var result = Synthesis.Synthesize(w, false);
+            displayWeaponSynthesisDynamically_first(w, result);
         }
 
         //-------------------------------------------------------------------------------
