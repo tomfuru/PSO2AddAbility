@@ -9,6 +9,22 @@ namespace PSO2AddAbility
     {
         public IAbility[] abilities;
 
+        public override bool Equals(object obj)
+        {
+            if (obj is Weapon) { return this.Equals(obj as Weapon); }
+            return base.Equals(obj);
+        }
+        public override int GetHashCode()
+        {
+            if (abilities == null) { return base.GetHashCode(); }
+            
+            int hash = abilities[0].GetHashCode();
+            for (int i = 1; i < abilities.Length; i++) {
+                hash ^= abilities[i].GetHashCode();
+            }
+            return hash;
+        }
+
         public bool Equals(Weapon other)
         {
             return (abilities.Length == other.abilities.Length)

@@ -21,19 +21,91 @@ namespace PSO2AddAbility
         {
             //Weapon w = new Weapon();
             //w.abilities = new IAbility[] { パワー.GetLv(3), ヴォル・ソール.Get(), アビリティ.GetLv(3), アーム.GetLv(3) };
-            //Synthesis.Synthesize(w);
+            //var result = Synthesis.Synthesize(w, false);
+            //displayWeaponSynthesis(w, result);
 
             Weapon w1 = new Weapon();
-            w1.abilities = new IAbility[] { パワー.GetLv(1), アーム.GetLv(1) };
+            w1.abilities = new IAbility[] { パワー.GetLv(3), アーム.GetLv(3) };
             var result1 = Synthesis.Synthesize(w1, false);
-
-            displayWeaponSynthesis(w1, result1);
+            displayWeaponSynthesisDynamically_first(w1, result1);
         }
 
+        //-------------------------------------------------------------------------------
+        #region -(Class)NodeInfo
+        //-------------------------------------------------------------------------------
+        private class NodeInfo
+        {
+            public bool isAddedNode = false;
+            public SynthesisWeapons[] synthesisWeapons;
+        }
+        //-------------------------------------------------------------------------------
+        #endregion (-(Class)NodeInfo)
+
+        //-------------------------------------------------------------------------------
+        #region displayWeaponSynthesisDynamically_first 最上階部分結果データ表示
+        //-------------------------------------------------------------------------------
+        //
+        private void displayWeaponSynthesisDynamically_first(Weapon weapon, SynthesisWeapons[] synthesisweapons)
+        {
+            TreeNode node = new TreeNode(weapon.ToString());
+            displayWeaponSynthesisDynamically(node, synthesisweapons);
+            treeViewResult.Nodes.Add(node);
+        }
+        #endregion (displayWeaponSynthesisDynamically_first)
+        //-------------------------------------------------------------------------------
+        #region displayWeaponSynthesisDynamically Expand時にデータを追加するようなノードを追加
+        //-------------------------------------------------------------------------------
+        //
+        private void displayWeaponSynthesisDynamically(TreeNode parent_node, SynthesisWeapons[] synthesisweapons)
+        {
+            var nodes = synthesisweapons.Select((sw, i) =>
+            {
+                var tn = new TreeNode(string.Format("case {0}", i + 1));
+                TreeNode node0 = new TreeNode(sw.info0.Weapon.ToString());
+                node0.Tag = new NodeInfo() { synthesisWeapons = sw.info0.SynthesisInfo };
+                if (sw.info0.SynthesisInfo != null) { node0.Nodes.Add(""); } // Expandできるようにダミーノード追加
+                TreeNode node1 = new TreeNode(sw.info1.Weapon.ToString());
+                node1.Tag = new NodeInfo() { synthesisWeapons = sw.info1.SynthesisInfo };
+                if (sw.info1.SynthesisInfo != null) { node1.Nodes.Add(""); } // Expandできるようにダミーノード追加
+                TreeNode node2 = new TreeNode(sw.info2.Weapon.ToString());
+                node2.Tag = new NodeInfo() { synthesisWeapons = sw.info2.SynthesisInfo };
+                if (sw.info2.SynthesisInfo != null) { node2.Nodes.Add(""); } // Expandできるようにダミーノード追加
+
+                tn.Nodes.AddRange(new TreeNode[] { node0, node1, node2 });
+                return tn;
+            });
+            parent_node.Nodes.Clear();
+            parent_node.Nodes.AddRange(nodes.ToArray());
+        }
+        #endregion (displayWeaponSynthesisDynamically)
+
+        //-------------------------------------------------------------------------------
+        #region treeViewResult_BeforeExpand Expand時に発生，項目を動的に追加
+        //-------------------------------------------------------------------------------
+        //
+        private void treeViewResult_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            NodeInfo info = e.Node.Tag as NodeInfo;
+            if (info == null) { return; }
+
+            if (!info.isAddedNode) {
+                displayWeaponSynthesisDynamically(e.Node, info.synthesisWeapons);
+
+                info.isAddedNode = true;
+            }
+        }
+        #endregion (treeViewResult_BeforeExpand)
+
+
+        //-------------------------------------------------------------------------------
+        #region displayWeaponSynthesis 全ノードを追加
+        //-------------------------------------------------------------------------------
+        //
         private void displayWeaponSynthesis(Weapon weapon, SynthesisWeapons[] synthesisweapons)
         {
             TreeNode node = new TreeNode(weapon.ToString());
-            var nodes = synthesisweapons.Select((sw, i) => {
+            var nodes = synthesisweapons.Select((sw, i) =>
+            {
                 var tn = new TreeNode(string.Format("case {0}", i + 1));
                 tn.Nodes.AddRange(new TreeNode[] {
                     displayWeaponSynthesisRecursive(sw.info0),
@@ -45,7 +117,11 @@ namespace PSO2AddAbility
             node.Nodes.AddRange(nodes.ToArray());
             treeViewResult.Nodes.Add(node);
         }
-
+        #endregion (displayWeaponSynthesis)
+        //-------------------------------------------------------------------------------
+        #region displayWeaponSynthesisRecursive 全ノードを追加(再帰部分)
+        //-------------------------------------------------------------------------------
+        //
         private TreeNode displayWeaponSynthesisRecursive(WeaponSynthesisInfo info)
         {
             TreeNode node = new TreeNode(info.Weapon.ToString());
@@ -64,6 +140,7 @@ namespace PSO2AddAbility
             }
             return node;
         }
+        #endregion (displayWeaponSynthesisRecursive)
 
     }
 }

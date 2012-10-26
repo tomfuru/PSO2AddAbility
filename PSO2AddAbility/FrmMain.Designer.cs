@@ -47,6 +47,7 @@
             this.treeViewResult.Name = "treeViewResult";
             this.treeViewResult.Size = new System.Drawing.Size(270, 454);
             this.treeViewResult.TabIndex = 1;
+            this.treeViewResult.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeViewResult_BeforeExpand);
             // 
             // FrmMain
             // 

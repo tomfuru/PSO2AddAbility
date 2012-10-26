@@ -20,8 +20,31 @@ namespace PSO2AddAbility
 
     public class Synthesis
     {
+        //-------------------------------------------------------------------------------
+        #region Constants
+        //-------------------------------------------------------------------------------
+        private static readonly int[][][][] COMBINATION = {
+           null,null,
+            new int[][][] {
+                null,
+                new int[][]{ new []{0}, new []{1}},
+                new int[][]{ new []{0, 1}}
+            },
+            new int[][][] {
+                null,
+                new int[][]{ new []{0}, new []{1}, new [] {2}},
+                new int[][]{ new []{0, 1}, new []{1, 2}, new []{2,0}},
+                new int[][]{ new []{0, 1, 2}}
+            }
+        };
+        //-------------------------------------------------------------------------------
+        #endregion (Constants)
+
         private Synthesis() { }
 
+        //-------------------------------------------------------------------------------
+        #region  -(class)AbilityInfo
+        //-------------------------------------------------------------------------------
         private class AbilityInfo
         {
             public IAbility Ability;
@@ -32,7 +55,10 @@ namespace PSO2AddAbility
                 return string.Format("{0} * {1}", Ability.ToString(), Num);
             }
         }
+        //-------------------------------------------------------------------------------
+        #endregion ( -(class)AbilityInfo)
 
+        /// <summary>メモ化用キャッシュ</summary>
         private static Dictionary<Weapon, SynthesisWeapons[]> winfo_cache = new Dictionary<Weapon, SynthesisWeapons[]>();
         //-------------------------------------------------------------------------------
         #region +Synthesize
@@ -157,21 +183,6 @@ namespace PSO2AddAbility
 
         }
         #endregion (Synthesize)
-
-        private static readonly int[][][][] COMBINATION = {
-           null,null,
-            new int[][][] {
-                null,
-                new int[][]{ new []{0}, new []{1}},
-                new int[][]{ new []{0, 1}}
-            },
-            new int[][][] {
-                null,
-                new int[][]{ new []{0}, new []{1}, new [] {2}},
-                new int[][]{ new []{0, 1}, new []{1, 2}, new []{2,0}},
-                new int[][]{ new []{0, 1, 2}}
-            }
-        };
 
         //-------------------------------------------------------------------------------
         #region -Assignments 特殊能力の振り分けリスト
