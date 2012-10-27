@@ -5,9 +5,6 @@ using System.Text;
 
 namespace PSO2AddAbility
 {
-    public abstract class Basic_up_with_SoulAmplifiable<T> : Basic_up, ISoulAmplifiable<T> where T : Soul { public bool IsAmplifiableSoul(Soul soul) { return (soul is T); } }
-    public abstract class Additional_with_SoulAmplifiable<T> : Additional, ISoulAmplifiable<T> where T : Soul { public bool IsAmplifiableSoul(Soul soul) { return (soul is T); } }
-
     /// <summary>能力UP</summary>
     public abstract class Basic_up : ToStringC, IWeapon, IUnit, ILevel, Inheritable { public int Level { get; protected set; } public abstract IAbility GetInstanceOfLv(int lv); }
     /// <summary>追加効果</summary>
@@ -19,7 +16,7 @@ namespace PSO2AddAbility
     /// <summary>ミューテーションⅠ，スティグマ</summary>
     public abstract class Special_up : ToStringC, IWeapon, IUnit, Inheritable { }
     /// <summary>○○・ソール</summary>
-    public abstract class Soul : ToStringC, IWeapon, IUnit, Inheritable { }
+    public abstract class Soul : ToStringC, IWeapon, IUnit, Inheritable { public abstract bool IsAmplifiableAbility(IAbility ab); }
 
     //-------------------------------------------------------------------------------
     #region abstract class ToStringC
@@ -71,5 +68,5 @@ namespace PSO2AddAbility
     /// <summary>ミューテーションⅠで能力が上がる</summary>
     public interface IMutationAmplifiable { }
     /// <summary>ソールで能力が上がる</summary>
-    public interface ISoulAmplifiable<S> where S : Soul { bool IsAmplifiableSoul(Soul soul); }
+    public interface ISoulAmplifiable<S> where S : Soul { }
 }

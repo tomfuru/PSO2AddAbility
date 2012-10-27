@@ -12,15 +12,15 @@ namespace PSO2AddAbility
         #region +[static]AllToString
         //-------------------------------------------------------------------------------
         //
-        public static string AllToString<T>(this T[] array)
+        public static string AllToString<T>(this T[] array, char first = '{', char last = '}')
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append('{');
+            sb.Append(first);
             for (int i = 0; i < array.Length; i++) {
                 sb.Append(array[i].ToString());
                 if (i < array.Length - 1) { sb.Append(", "); }
             }
-            sb.Append('}');
+            sb.Append(last);
             return sb.ToString();
         }
         #endregion (ToString)

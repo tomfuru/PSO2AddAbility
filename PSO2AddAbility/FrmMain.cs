@@ -56,7 +56,7 @@ namespace PSO2AddAbility
         {
             var nodes = synthesisweapons.Select((sw, i) =>
             {
-                var tn = new TreeNode(string.Format("case {0}", i + 1));
+                var tn = new TreeNode(string.Format("case {0} {1}", i + 1, sw.probabilities.Select(f => ((int)(f * 100)).ToString() + '%').ToArray().AllToString('[', ']')));
                 TreeNode node0 = new TreeNode(sw.info0.Weapon.ToString());
                 node0.Tag = new NodeInfo() { synthesisWeapons = sw.info0.SynthesisInfo };
                 if (sw.info0.SynthesisInfo != null) { node0.Nodes.Add(""); } // Expandできるようにダミーノード追加
@@ -93,6 +93,9 @@ namespace PSO2AddAbility
         #endregion (treeViewResult_BeforeExpand)
 
 
+        //-------------------------------------------------------------------------------
+        #region (commented out)
+        /*
         //-------------------------------------------------------------------------------
         #region displayWeaponSynthesis 全ノードを追加
         //-------------------------------------------------------------------------------
@@ -137,6 +140,9 @@ namespace PSO2AddAbility
             return node;
         }
         #endregion (displayWeaponSynthesisRecursive)
+        */
+        //-------------------------------------------------------------------------------
+        #endregion ((commented out))
 
     }
 }

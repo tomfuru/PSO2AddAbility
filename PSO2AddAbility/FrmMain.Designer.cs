@@ -57,7 +57,7 @@
             this.Controls.Add(this.treeViewResult);
             this.Controls.Add(this.button1);
             this.Name = "FrmMain";
-            this.Text = "Form1";
+            this.Text = "PSO2AddAbility";
             this.ResumeLayout(false);
 
         }

@@ -14,6 +14,7 @@ namespace PSO2AddAbility
 
     public class SynthesisWeapons
     {
+        public float[] probabilities;
         public WeaponSynthesisInfo info0;
         public WeaponSynthesisInfo info1;
         public WeaponSynthesisInfo info2;
@@ -121,7 +122,7 @@ namespace PSO2AddAbility
                     if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
                     if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
 
-                    GetProbabilities(objective, co[0], co[1], co[2]);
+                    var probs = GetProbabilities(objective, co[0], co[1], co[2]); // 確率を求める
 
                     WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() { 
                         Weapon = co[0],
@@ -139,7 +140,8 @@ namespace PSO2AddAbility
                     SynthesisWeapons sw = new SynthesisWeapons() {
                         info0 = info0,
                         info1 = info1,
-                        info2 = info2
+                        info2 = info2,
+                        probabilities = probs
                     };
 
                     sw_list.Add(sw);
@@ -291,6 +293,15 @@ namespace PSO2AddAbility
         #region +GetProbability
         //-------------------------------------------------------------------------------
         /// <summary>
+        /// <para>[a,b]</para>
+        /// <para>a:能力UPの時0,効果付加の時1</para>
+        /// <para>b:ミューテーションⅠ付2, 増幅対象ソール付1,その他0</para>
+        /// </summary>
+        private static readonly float[,][,] PROB_TABLE = {
+            {Data.PROB_NORMAL_BASIC, Data.PROB_SOUL_BASIC, Data.PROB_MUTATION1_BASIC},
+            {Data.PROB_NORMAL_ADDITIONAL, Data.PROB_SOUL_ADDITIONAL, Data.PROB_MUTATION1_ADDITIONAL}
+        };
+        /// <summary>
         /// 1能力についての能力付加確率を返す(EXTRA補正無し)
         /// </summary>
         /// <returns></returns>
@@ -303,15 +314,24 @@ namespace PSO2AddAbility
                 return Data.PROB_SOUL[Data.INH[num]];
             }
             else if (objective is Ability) {
-                
+                ILevel ab_lv = objective as ILevel;
+                int inh_num = weapons.Count(weapon => weapon.ContainsAbility(objective));
+                float inh_prob = (inh_num >= 1) ? Data.PROB_NORMAL_ABILITY[ab_lv.Level, Data.INH[inh_num]] : 0.0f;
+
+
+                bool generable = weapons.Any(weapon => weapon.ContainsAbility(パワー.GetLv(ab_lv.Level)))
+                              && weapons.Any(weapon => weapon.ContainsAbility(シュート.GetLv(ab_lv.Level)))
+                              && weapons.Any(weapon => weapon.ContainsAbility(テクニック.GetLv(ab_lv.Level)));
+                float gen_prob = (generable) ? Data.PROB_NORMAL_ABILITY[ab_lv.Level, Data.GEN_SP] : 0.0f;
+
+                return Math.Max(inh_prob, gen_prob);
             }
             else if (objective is Basic_up || objective is Additional) {
                 ILevel ab_lv = objective as ILevel;
                 bool mutation_amp = (objective is IMutationAmplifiable) && weapons.Any(weapon => weapon.ContainsAbility(ミューテーションⅠ.Get()));
-                //bool soul_amp = weapons.Any(weapon => weapon.Any(ab => ab is Soul && )));
-                
+                bool soul_amp = !mutation_amp && weapons.Any(weapon => weapon.Any(ab => ab is Soul && (ab as Soul).IsAmplifiableAbility(objective))); // !mutation_ampはミューテーションによる増加がある場合はソールについて調べる必要がない為
                     
-                float[,] prob_table = (objective is Basic_up) ? Data.PROB_NORMAL_BASIC : Data.PROB_NORMAL_ADDITIONAL;
+                float[,] prob_table = PROB_TABLE[(objective is Basic_up) ? 0 : 1, (mutation_amp) ? 2 : (soul_amp) ? 1 : 0];
 
                 int inh_num = weapons.Count(weapon => weapon.ContainsAbility(objective));
                 float inh_prob = (inh_num >= 1) ? prob_table[ab_lv.Level, Data.INH[inh_num]] : 0.0f;
@@ -323,6 +343,7 @@ namespace PSO2AddAbility
                 return Math.Max(inh_prob, gen_prob);
             }
 
+            Debug.Assert(false);
             return 0.0f;
         }
         #endregion (GetProbability)
