@@ -68,5 +68,15 @@ namespace PSO2AddAbility
             return (ability is ISoulAmplifiable<T>); 
         }
         #endregion (Name)
+
+        //-------------------------------------------------------------------------------
+        #region +[static]ProbabilityToString 確率を文字列に
+        //-------------------------------------------------------------------------------
+        //
+        public static string ProbabilityToString(float f)
+        {
+            return ((int)(f * 100)).ToString() + '%';
+        }
+        #endregion (ProbabilityToString)
     }
 }
