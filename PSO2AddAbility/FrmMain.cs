@@ -67,17 +67,25 @@ namespace PSO2AddAbility
             var nodes = synthesisweapons.Select((sw, i) =>
             {
                 var tn = new TreeNode(string.Format("case {0} {1} {2}", i + 1, Util.ProbabilityToString(sw.probabilities.Aggregate(1.0f, (f1, f2) => f1 *  f2)) ,sw.probabilities.Select(Util.ProbabilityToString).ToArray().AllToString('[', ']')));
+                List<TreeNode> nodeList = new List<TreeNode>();
+                
                 TreeNode node0 = new TreeNode(sw.info0.Weapon.ToString());
                 node0.Tag = new NodeInfo() { synthesisWeapons = sw.info0.SynthesisInfo };
                 if (sw.info0.SynthesisInfo != null) { node0.Nodes.Add(""); } // Expandできるようにダミーノード追加
+                nodeList.Add(node0);
+
                 TreeNode node1 = new TreeNode(sw.info1.Weapon.ToString());
                 node1.Tag = new NodeInfo() { synthesisWeapons = sw.info1.SynthesisInfo };
                 if (sw.info1.SynthesisInfo != null) { node1.Nodes.Add(""); } // Expandできるようにダミーノード追加
-                TreeNode node2 = new TreeNode(sw.info2.Weapon.ToString());
-                node2.Tag = new NodeInfo() { synthesisWeapons = sw.info2.SynthesisInfo };
-                if (sw.info2.SynthesisInfo != null) { node2.Nodes.Add(""); } // Expandできるようにダミーノード追加
-
-                tn.Nodes.AddRange(new TreeNode[] { node0, node1, node2 });
+                nodeList.Add(node1);
+                
+                if (sw.info2 != null) {
+                    TreeNode node2 = new TreeNode(sw.info2.Weapon.ToString());
+                    node2.Tag = new NodeInfo() { synthesisWeapons = sw.info2.SynthesisInfo };
+                    if (sw.info2.SynthesisInfo != null) { node2.Nodes.Add(""); } // Expandできるようにダミーノード追加
+                    nodeList.Add(node2);
+                }
+                tn.Nodes.AddRange(nodeList.ToArray());
                 tn.Expand();
                 return tn;
             });
@@ -102,6 +110,11 @@ namespace PSO2AddAbility
             }
         }
         #endregion (treeViewResult_BeforeExpand)
+
+        private void tsmi設定_Click(object sender, EventArgs e)
+        {
+
+        }
 
 
         //-------------------------------------------------------------------------------

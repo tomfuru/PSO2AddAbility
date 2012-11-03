@@ -61,6 +61,32 @@ namespace PSO2AddAbility
         #endregion (Equals(Weapon))
 
         //-------------------------------------------------------------------------------
+        #region +ActuallyEqual
+        //-------------------------------------------------------------------------------
+        /// <summary>
+        /// <para>実質的に同じ武器かどうか．</para>
+        /// <para>"ゴミ"が他のアビリティに合致</para>
+        /// </summary>
+        /// <param name="weapon"></param>
+        /// <returns></returns>
+        public bool ActuallyEqual(Weapon weapon)
+        {
+            if (weapon.AbilityNum != this.AbilityNum) { return false; }
+
+            int garbage_num = weapon.Count(ia => ia == ゴミ.Get());
+
+            foreach (var ability in _abilities) {
+                if (ability is ゴミ) { continue; }
+                if (!weapon.ContainsAbility(ability)) {
+                    --garbage_num;
+                    if (garbage_num < 0) { return false; }
+                }
+            }
+            return true;
+        }
+        #endregion (ActuallyEqual)
+
+        //-------------------------------------------------------------------------------
         #region +[override]ToString
         //-------------------------------------------------------------------------------
         //

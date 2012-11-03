@@ -77,7 +77,6 @@ namespace PSO2AddAbility
         public static readonly int[] GEN = new int[] { -1, -1, 0, 1 };
         public static readonly int[] INH = new int[] { -1, 2, 3, 4 };
         private const float NaN = float.NaN;
-        private const float UK = float.NaN;
 
         /// <summary>[(LV),(GEN[2-3] or INH[1-3])]</summary>
         public static readonly float[,] PROB_NORMAL_BASIC = {
@@ -85,8 +84,8 @@ namespace PSO2AddAbility
             {   NaN,   NaN, 1.00f, 1.00f, 1.00f },
             { 0.60f, 0.80f, 0.60f, 0.80f, 1.00f },
             { 0.30f, 0.50f, 0.60f, 0.80f, 1.00f },
-            { 0.20f, 0.40f, 0.40f,    UK,    UK },
-            { 0.10f, 0.30f, 0.20f,    UK,    UK }
+            { 0.20f, 0.40f, 0.40f, 0.60f, 0.80f },
+            { 0.10f, 0.30f, 0.20f, 0.40f, 0.60f }
         };
         /// <summary>[(LV),(GEN[2-3] or INH[1-3])]</summary>
         public static readonly float[,] PROB_NORMAL_ADDITIONAL = {
@@ -95,14 +94,14 @@ namespace PSO2AddAbility
             { 0.60f, 0.80f, 0.40f, 0.60f, 0.80f },
             { 0.20f, 0.40f, 0.20f, 0.40f, 0.60f },
             { 0.20f, 0.40f, 0.20f, 0.30f, 0.50f },
-            { 0.10f, 0.30f, 0.10f, 0.20f,    UK }
+            { 0.10f, 0.30f, 0.10f, 0.20f, 0.40f }
         };
         /// <summary>[(LV),(GEN_SP] or INH[1-3])]</summary>
         public static readonly float[,] PROB_NORMAL_ABILITY = {
             {   NaN,   NaN,   NaN,   NaN,   NaN }, // dummy
             { 0.80f,   NaN, 1.00f, 1.00f, 1.00f },
             { 0.69f,   NaN, 0.20f, 0.40f, 0.60f },
-            { 0.60f,   NaN, 0.10f,    UK,    UK },                  
+            { 0.60f,   NaN, 0.10f, 0.40f, 0.60f }                  
         };
 
         /// <summary>[(LV),(GEN[2-3] or INH[1-3])]</summary>
@@ -111,8 +110,8 @@ namespace PSO2AddAbility
             {   NaN,   NaN, 1.00f, 1.00f, 1.00f },
             { 0.60f, 0.80f, 0.60f, 0.80f, 1.00f },
             { 0.60f, 0.80f, 0.60f, 0.80f, 1.00f },
-            { 0.20f, 0.40f, 0.40f,    UK,    UK },
-            { 0.10f, 0.30f, 0.20f,    UK,    UK }                                          
+            { 0.20f, 0.40f, 0.40f, 0.60f, 0.80f },
+            { 0.10f, 0.30f, 0.20f, 0.40f, 0.60f }                                    
         };
         /// <summary>[(LV),(GEN[2-3] or INH[1-3])]</summary>
         public static readonly float[,] PROB_MUTATION1_ADDITIONAL = {
@@ -121,7 +120,7 @@ namespace PSO2AddAbility
             { 0.60f, 0.80f, 0.40f, 0.60f, 0.80f },
             { 0.60f, 0.80f, 0.20f, 0.40f, 0.60f },
             { 0.20f, 0.40f, 0.20f, 0.30f, 0.50f },
-            { 0.10f, 0.30f, 0.10f, 0.20f,    UK }
+            { 0.10f, 0.30f, 0.10f, 0.20f, 0.40f }
         };
 
         /// <summary>[(LV),(GEN[2-3] or INH[1-3])]</summary>
@@ -130,8 +129,8 @@ namespace PSO2AddAbility
             {   NaN,   NaN, 1.00f, 1.00f, 1.00f },
             { 0.60f, 0.80f, 0.60f, 0.80f, 1.00f },
             { 0.50f, 0.69f, 0.80f, 1.00f, 1.00f },
-            { 0.40f, 0.60f, 0.40f,    UK,    UK },
-            { 0.10f, 0.30f, 0.20f,    UK,    UK }                                          
+            { 0.40f, 0.60f, 0.40f, 0.60f, 0.80f },
+            { 0.10f, 0.30f, 0.20f, 0.40f, 0.60f }
         };
         /// <summary>[(LV),(GEN[2-3] or INH[1-3])]</summary>
         public static readonly float[,] PROB_SOUL_ADDITIONAL = {
@@ -140,7 +139,7 @@ namespace PSO2AddAbility
             { 0.60f, 0.80f, 0.40f, 0.60f, 0.80f },
             { 0.50f, 0.69f, 0.80f, 1.00f, 1.00f },
             { 0.40f, 0.60f, 0.20f, 0.30f, 0.50f },
-            { 0.10f, 0.30f, 0.10f, 0.20f,    UK }
+            { 0.10f, 0.30f, 0.10f, 0.20f, 0.40f }
         };
 
         /// <summary>[INH[2-3]]</summary>
@@ -148,14 +147,14 @@ namespace PSO2AddAbility
 
         /// <summary>[(現在スロット),(素材数)]</summary>
         public static readonly float[,] PROB_CORRECTION_EXTRA = {
-            { NaN, 0.80f, 0.80f },
-            { NaN, 0.70f, 0.75f },
-            { NaN, 0.60f, 0.70f },
-            { NaN, 0.50f, 0.60f },
-            { NaN, 0.45f, 0.55f },
-            { NaN, 0.40f, 0.50f },
-            { NaN, 0.35f, 0.40f },
-            { NaN, 0.30f, 0.30f }
+            { NaN, NaN, 0.80f, 0.80f },
+            { NaN, NaN, 0.70f, 0.75f },
+            { NaN, NaN, 0.60f, 0.70f },
+            { NaN, NaN, 0.50f, 0.60f },
+            { NaN, NaN, 0.45f, 0.55f },
+            { NaN, NaN, 0.40f, 0.50f },
+            { NaN, NaN, 0.35f, 0.40f },
+            { NaN, NaN, 0.30f, 0.30f }
         };
     }
 }

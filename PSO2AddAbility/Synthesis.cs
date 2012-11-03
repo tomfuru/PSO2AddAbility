@@ -68,16 +68,16 @@ namespace PSO2AddAbility
         //
         public static SynthesisWeapons[] Synthesize(Weapon objective, bool isMaterial)
         {
-            if (winfo_cache.ContainsKey(objective)) {
+            if (winfo_cache.ContainsKey(objective)) { // 今まであったものなら参照
                 return winfo_cache[objective];
             }
-            else if (IsBasicWeapon(objective)) {
+            else if (IsBasicWeapon(objective)) { // BasicWeaponならそれ以上探さない
                 return null;
             }
 
             int num_slot = objective.AbilityNum;
             // 必要な素材能力の候補リストを取得
-            var need_materials = objective.Select(ab => Data.GetMaterialAbilities(ab)).ToArray();
+            var need_materials = objective.Select(Data.GetMaterialAbilities).ToArray();
 
             // 1能力に必要な能力が複数ある(パワーⅢはパワーⅡ*2でも3でも作れる等)ため，それらの候補のすべての組み合わせリストを取得
             // 候補->全能力[全能力->1能力の必要能力[1能力の必要能力->能力]]
@@ -116,26 +116,24 @@ namespace PSO2AddAbility
                 var a4 = Assignments(2, num_slot - 1, elements).ToArray();
                 */
 
+                Func<Weapon[], SynthesisWeapons> synthesis = combweapon =>
+                {
+                    bool three_weapons = (combweapon.Length == 3);
+                    var probs = GetProbabilities(objective, combweapon[0], combweapon[1], (three_weapons) ? combweapon[2] : null); // 確率を求める
 
-                // 3本，(目的能力数)の合成で行う場合
-                foreach (var co in Assignments(3, num_slot, elements)) {
-                    if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
-                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
-
-                    var probs = GetProbabilities(objective, co[0], co[1], co[2]); // 確率を求める
-
-                    WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() { 
-                        Weapon = co[0],
-                        SynthesisInfo = (IsBasicWeapon(co[0])) ? null : Synthesize(co[0], false)
+                    WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() {
+                        Weapon = combweapon[0],
+                        SynthesisInfo = (IsBasicWeapon(combweapon[0])) ? null : Synthesize(combweapon[0], false)
                     };
-                    WeaponSynthesisInfo info1 = new WeaponSynthesisInfo() { 
-                        Weapon = co[1],
-                        SynthesisInfo = (IsBasicWeapon(co[1])) ? null : Synthesize(co[1], true)
+                    WeaponSynthesisInfo info1 = new WeaponSynthesisInfo() {
+                        Weapon = combweapon[1],
+                        SynthesisInfo = (IsBasicWeapon(combweapon[1])) ? null : Synthesize(combweapon[1], true)
                     };
-                    WeaponSynthesisInfo info2 = new WeaponSynthesisInfo() { 
-                        Weapon = co[2],
-                        SynthesisInfo = (IsBasicWeapon(co[2])) ? null : Synthesize(co[2], true)
-                    };
+                    WeaponSynthesisInfo info2 = (three_weapons) ? new WeaponSynthesisInfo() {
+                        Weapon = combweapon[2],
+                        SynthesisInfo = (IsBasicWeapon(combweapon[2])) ? null : Synthesize(combweapon[2], true)
+                    }
+                    : null;
 
                     SynthesisWeapons sw = new SynthesisWeapons() {
                         info0 = info0,
@@ -144,6 +142,15 @@ namespace PSO2AddAbility
                         probabilities = probs
                     };
 
+                    return sw;
+                };
+
+                // 3本，(目的能力数)の合成で行う場合
+                foreach (var co in Assignments(3, num_slot, elements)) {
+                    if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
+                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
+
+                    var sw = synthesis(co);
                     sw_list.Add(sw);
 
                     /*
@@ -154,25 +161,31 @@ namespace PSO2AddAbility
                     }
                     */
                 }
-
-
-                /*
+                
                 // 3本，(目的能力数)-1の合成で行う場合
                 foreach (var co in Assignments(3, num_slot - 1, elements)) {
-                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
+                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
+
+                    var sw = synthesis(co);
+                    sw_list.Add(sw);
                 }
 
                 // 2本，(目的能力数)の合成で行う場合
                 foreach (var co in Assignments(2, num_slot, elements)) {
-                    if (objective.Equals(co.ElementAt(0))) { continue; } // 目標武器に目標能力がついていたら意味がない
-                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
+                    if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
+                    if (isMaterial && objective.Equals(co[1])) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
+
+                    var sw = synthesis(co);
+                    sw_list.Add(sw);
                 }
 
                 // 2本，(目的能力数)-1の合成で行う場合
                 foreach (var co in Assignments(2, num_slot - 1, elements)) {
-                    // TODO:BasicWeaponか判別，そうでないなら再帰的に合成過程を調べる
+                    if (isMaterial && objective.Equals(co[1])) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
+
+                    var sw = synthesis(co);
+                    sw_list.Add(sw);
                 }
-                */
             }
 
             SynthesisWeapons[] ret = sw_list.ToArray();
@@ -310,7 +323,7 @@ namespace PSO2AddAbility
             IEnumerable<Weapon> weapons = (new Weapon[] { weapon1, weapon2, weapon3 }).Where(w => w != null);
             if (objective is Boost) { return 1.00f; }
             if (objective is Soul || objective is Special_up) {
-                int num = weapons.Count(weapon =>  weapon.ContainsAbility(objective));
+                int num = weapons.Count(weapon => weapon.ContainsAbility(objective));
                 return Data.PROB_SOUL[Data.INH[num]];
             }
             else if (objective is Ability) {
@@ -330,7 +343,7 @@ namespace PSO2AddAbility
                 ILevel ab_lv = objective as ILevel;
                 bool mutation_amp = (objective is IMutationAmplifiable) && weapons.Any(weapon => weapon.ContainsAbility(ミューテーションⅠ.Get()));
                 bool soul_amp = !mutation_amp && weapons.Any(weapon => weapon.Any(ab => ab is Soul && (ab as Soul).IsAmplifiableAbility(objective))); // !mutation_ampはミューテーションによる増加がある場合はソールについて調べる必要がない為
-                    
+
                 float[,] prob_table = PROB_TABLE[(objective is Basic_up) ? 0 : 1, (mutation_amp) ? 2 : (soul_amp) ? 1 : 0];
 
                 int inh_num = weapons.Count(weapon => weapon.ContainsAbility(objective));
