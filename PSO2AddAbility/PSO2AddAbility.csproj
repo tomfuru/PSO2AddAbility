@@ -57,6 +57,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Synthesis.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="WeaponAbilityInput.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WeaponAbilityInput.Designer.cs">
+      <DependentUpon>WeaponAbilityInput.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="FrmMain.resx">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -69,6 +75,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="WeaponAbilityInput.resx">
+      <DependentUpon>WeaponAbilityInput.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

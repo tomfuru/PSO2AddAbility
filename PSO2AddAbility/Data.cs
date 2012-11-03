@@ -53,6 +53,14 @@ namespace PSO2AddAbility
             ボディ.GetLv(1),  リアクト.GetLv(1), マインド.GetLv(1), 
             アーム.GetLv(1), スタミナ.GetLv(1), スピリタ.GetLv(1),
 
+            バーン.GetLv(1), フリーズ.GetLv(1), ショック.GetLv(1), 
+            ミラージュ.GetLv(1), パニック.GetLv(1), ポイズン.GetLv(1),
+            ブロウレジスト.GetLv(1), ショットレジスト.GetLv(1), マインドレジスト.GetLv(1),
+            フレイムレジスト.GetLv(1), アイスレジスト.GetLv(1), ショックレジスト.GetLv(1), 
+            ウィンドレジスト.GetLv(1), ライトレジスト.GetLv(1), グルームレジスト.GetLv(1),
+            
+            アビリティ.GetLv(1),
+
             ミューテーションⅠ.Get(),
             ヴォル・ソール.Get(), グワナ・ソール.Get(), クォーツ・ソール.Get(), 
             ランサ・ソール.Get(), ファング・ソール.Get(), マイザー・ソール.Get(),
@@ -62,15 +70,7 @@ namespace PSO2AddAbility
             マルモ・ソール.Get(), ヴァーダー・ソール.Get(), 
             キャタ・ソール.Get(),
 
-            スタミナ・ブースト.Get(), スピリタ・ブースト.Get(),
-
-            アビリティ.GetLv(1),
-
-            バーン.GetLv(1), フリーズ.GetLv(1), ショック.GetLv(1), 
-            ミラージュ.GetLv(1), パニック.GetLv(1), ポイズン.GetLv(1),
-            ブロウレジスト.GetLv(1), ショットレジスト.GetLv(1), マインドレジスト.GetLv(1),
-            フレイムレジスト.GetLv(1), アイスレジスト.GetLv(1), ショックレジスト.GetLv(1), 
-            ウィンドレジスト.GetLv(1), ライトレジスト.GetLv(1), グルームレジスト.GetLv(1)
+            スタミナ・ブースト.Get(), スピリタ・ブースト.Get()
         };
 
         public const int GEN_SP = 0;

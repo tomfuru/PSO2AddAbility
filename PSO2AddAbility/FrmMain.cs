@@ -12,19 +12,28 @@ namespace PSO2AddAbility
 {
     public partial class FrmMain : Form
     {
+        //-------------------------------------------------------------------------------
+        #region Constructor  
+        //-------------------------------------------------------------------------------
+        //
         public FrmMain()
         {
             InitializeComponent();
         }
+        #endregion (Constructor)
 
-        private void button1_Click(object sender, EventArgs e)
+        //-------------------------------------------------------------------------------
+        #region btnSynthesis_Click 合成ボタン
+        //-------------------------------------------------------------------------------
+        //
+        private void btnSynthesis_Click(object sender, EventArgs e)
         {
-            //Weapon w = new Weapon(パワー.GetLv(3), ヴォル・ソール.Get(), アビリティ.GetLv(3), アーム.GetLv(3));
-            //Weapon w = new Weapon(パワー.GetLv(3), アーム.GetLv(3));
-            Weapon w = new Weapon(パワー.GetLv(3), ファング・ソール.Get());
+            Weapon w = new Weapon(waInputObjective.GetAbilities().ToArray());
+
             var result = Synthesis.Synthesize(w, false);
             displayWeaponSynthesisDynamically_first(w, result);
         }
+        #endregion (btnSynthesis_Click)
 
         //-------------------------------------------------------------------------------
         #region -(Class)NodeInfo
@@ -46,6 +55,7 @@ namespace PSO2AddAbility
             TreeNode node = new TreeNode(weapon.ToString());
             displayWeaponSynthesisDynamically(node, synthesisweapons);
             treeViewResult.Nodes.Add(node);
+            node.Expand();
         }
         #endregion (displayWeaponSynthesisDynamically_first)
         //-------------------------------------------------------------------------------
@@ -68,6 +78,7 @@ namespace PSO2AddAbility
                 if (sw.info2.SynthesisInfo != null) { node2.Nodes.Add(""); } // Expandできるようにダミーノード追加
 
                 tn.Nodes.AddRange(new TreeNode[] { node0, node1, node2 });
+                tn.Expand();
                 return tn;
             });
             parent_node.Nodes.Clear();

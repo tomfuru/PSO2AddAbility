@@ -128,6 +128,7 @@ namespace PSO2AddAbility
         private static パワー[] values = new パワー[] { null, new パワー(1), new パワー(2), new パワー(3), new パワー(4), new パワー(5) };
         public static IAbility GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class シュート : Basic_up, IMutationAmplifiable, ISoulAmplifiable<マイザー・ソール>
     {
@@ -135,6 +136,7 @@ namespace PSO2AddAbility
         private static シュート[] values = new シュート[] { null, new シュート(1), new シュート(2), new シュート(3), new シュート(4), new シュート(5) };
         public static シュート GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class テクニック : Basic_up, IMutationAmplifiable, ISoulAmplifiable<クォーツ・ソール>
     {
@@ -142,6 +144,7 @@ namespace PSO2AddAbility
         private static テクニック[] values = new テクニック[] { null, new テクニック(1), new テクニック(2), new テクニック(3), new テクニック(4), new テクニック(5) };
         public static テクニック GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ボディ : Basic_up, IMutationAmplifiable, ISoulAmplifiable<スノウ・ソール>
     {
@@ -149,6 +152,7 @@ namespace PSO2AddAbility
         private static ボディ[] values = new ボディ[] { null, new ボディ(1), new ボディ(2), new ボディ(3), new ボディ(4), new ボディ(5) };
         public static ボディ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class リアクト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ラグネ・ソール>
     {
@@ -156,6 +160,7 @@ namespace PSO2AddAbility
         private static リアクト[] values = new リアクト[] { null, new リアクト(1), new リアクト(2), new リアクト(3), new リアクト(4), new リアクト(5) };
         public static リアクト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class マインド : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ロックベア・ソール>
     {
@@ -163,6 +168,7 @@ namespace PSO2AddAbility
         private static マインド[] values = new マインド[] { null, new マインド(1), new マインド(2), new マインド(3), new マインド(4), new マインド(5) };
         public static マインド GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class アーム : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ヴォル・ソール>
     {
@@ -170,6 +176,7 @@ namespace PSO2AddAbility
         private static アーム[] values = new アーム[] { null, new アーム(1), new アーム(2), new アーム(3), new アーム(4), new アーム(5) };
         public static アーム GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class スタミナ : Basic_up, IMutationAmplifiable, ISoulAmplifiable<マルモ・ソール>
     {
@@ -177,6 +184,7 @@ namespace PSO2AddAbility
         private static スタミナ[] values = new スタミナ[] { null, new スタミナ(1), new スタミナ(2), new スタミナ(3), new スタミナ(4), new スタミナ(5) };
         public static スタミナ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class スピリタ : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ラッピー・ソール>
     {
@@ -184,6 +192,7 @@ namespace PSO2AddAbility
         private static スピリタ[] values = new スピリタ[] { null, new スピリタ(1), new スピリタ(2), new スピリタ(3), new スピリタ(4), new スピリタ(5) };
         public static スピリタ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     //-------------------------------------------------------------------------------
     public class バーン : Additional, IMutationAmplifiable, ISoulAmplifiable<ヴォル・ソール>
@@ -192,6 +201,7 @@ namespace PSO2AddAbility
         private static バーン[] values = new バーン[] { null, new バーン(1), new バーン(2), new バーン(3), new バーン(4), new バーン(5) };
         public static バーン GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class フリーズ : Additional, IMutationAmplifiable, ISoulAmplifiable<マルモ・ソール>
     {
@@ -199,6 +209,7 @@ namespace PSO2AddAbility
         private static フリーズ[] values = new フリーズ[] { null, new フリーズ(1), new フリーズ(2), new フリーズ(3), new フリーズ(4), new フリーズ(5) };
         public static フリーズ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ショック : Additional, IMutationAmplifiable, ISoulAmplifiable<ファング・ソール>
     {
@@ -206,6 +217,7 @@ namespace PSO2AddAbility
         private static ショック[] values = new ショック[] { null, new ショック(1), new ショック(2), new ショック(3), new ショック(4), new ショック(5) };
         public static ショック GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ミラージュ : Additional, IMutationAmplifiable, ISoulAmplifiable<シグノ・ソール>
     {
@@ -213,6 +225,7 @@ namespace PSO2AddAbility
         private static ミラージュ[] values = new ミラージュ[] { null, new ミラージュ(1), new ミラージュ(2), new ミラージュ(3), new ミラージュ(4), new ミラージュ(5) };
         public static ミラージュ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class パニック : Additional, IMutationAmplifiable, ISoulAmplifiable<クォーツ・ソール>
     {
@@ -220,6 +233,7 @@ namespace PSO2AddAbility
         private static パニック[] values = new パニック[] { null, new パニック(1), new パニック(2), new パニック(3), new パニック(4), new パニック(5) };
         public static パニック GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ポイズン : Additional, IMutationAmplifiable, ISoulAmplifiable<グワナ・ソール>
     {
@@ -227,6 +241,7 @@ namespace PSO2AddAbility
         private static ポイズン[] values = new ポイズン[] { null, new ポイズン(1), new ポイズン(2), new ポイズン(3), new ポイズン(4), new ポイズン(5) };
         public static ポイズン GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     //-------------------------------------------------------------------------------
     public class ブロウレジスト : Basic_up, IMutationAmplifiable
@@ -235,6 +250,7 @@ namespace PSO2AddAbility
         private static ブロウレジスト[] values = new ブロウレジスト[] { null, new ブロウレジスト(1), new ブロウレジスト(2), new ブロウレジスト(3), new ブロウレジスト(4), new ブロウレジスト(5) };
         public static ブロウレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ショットレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ヴァーダー・ソール>
     {
@@ -242,6 +258,7 @@ namespace PSO2AddAbility
         private static ショットレジスト[] values = new ショットレジスト[] { null, new ショットレジスト(1), new ショットレジスト(2), new ショットレジスト(3), new ショットレジスト(4), new ショットレジスト(5) };
         public static ショットレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class マインドレジスト : Basic_up, IMutationAmplifiable
     {
@@ -249,6 +266,7 @@ namespace PSO2AddAbility
         private static マインドレジスト[] values = new マインドレジスト[] { null, new マインドレジスト(1), new マインドレジスト(2), new マインドレジスト(3), new マインドレジスト(4), new マインドレジスト(5) };
         public static マインドレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class フレイムレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<キャタ・ソール>
     {
@@ -257,6 +275,7 @@ namespace PSO2AddAbility
         private static フレイムレジスト[] values = new フレイムレジスト[] { null, new フレイムレジスト(1), new フレイムレジスト(2), new フレイムレジスト(3), new フレイムレジスト(4), new フレイムレジスト(5) };
         public static フレイムレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class アイスレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<スノウ・ソール>
     {
@@ -264,6 +283,7 @@ namespace PSO2AddAbility
         private static アイスレジスト[] values = new アイスレジスト[] { null, new アイスレジスト(1), new アイスレジスト(2), new アイスレジスト(3), new アイスレジスト(4), new アイスレジスト(5) };
         public static アイスレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ショックレジスト : Basic_up, IMutationAmplifiable
     {
@@ -271,6 +291,7 @@ namespace PSO2AddAbility
         private static ショックレジスト[] values = new ショックレジスト[] { null, new ショックレジスト(1), new ショックレジスト(2), new ショックレジスト(3), new ショックレジスト(4), new ショックレジスト(5) };
         public static ショックレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ウィンドレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ヴァーダー・ソール>
     {
@@ -278,6 +299,7 @@ namespace PSO2AddAbility
         private static ウィンドレジスト[] values = new ウィンドレジスト[] { null, new ウィンドレジスト(1), new ウィンドレジスト(2), new ウィンドレジスト(3), new ウィンドレジスト(4), new ウィンドレジスト(5) };
         public static ウィンドレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class ライトレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ラッピー・ソール>
     {
@@ -285,6 +307,7 @@ namespace PSO2AddAbility
         private static ライトレジスト[] values = new ライトレジスト[] { null, new ライトレジスト(1), new ライトレジスト(2), new ライトレジスト(3), new ライトレジスト(4), new ライトレジスト(5) };
         public static ライトレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     public class グルームレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ラグネ・ソール>
     {
@@ -292,6 +315,7 @@ namespace PSO2AddAbility
         private static グルームレジスト[] values = new グルームレジスト[] { null, new グルームレジスト(1), new グルームレジスト(2), new グルームレジスト(3), new グルームレジスト(4), new グルームレジスト(5) };
         public static グルームレジスト GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     //-------------------------------------------------------------------------------
     public class アビリティ : Ability
@@ -300,6 +324,7 @@ namespace PSO2AddAbility
         private static アビリティ[] values = new アビリティ[] { null, new アビリティ(1), new アビリティ(2), new アビリティ(3) };
         public static アビリティ GetLv(int lv) { return values[lv]; }
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 3); }
     }
     //-------------------------------------------------------------------------------
     public class スタミナ・ブースト : Boost
