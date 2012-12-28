@@ -270,7 +270,7 @@ namespace PSO2AddAbility
         public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
     //-------------------------------------------------------------------------------
-    public class ブロウレジスト : Basic_up, IMutationAmplifiable
+    public class ブロウレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ロックベア・ソール>
     {
         public ブロウレジスト(int lv) { Level = lv; }
         private static ブロウレジスト[] values = new ブロウレジスト[] { null, new ブロウレジスト(1), new ブロウレジスト(2), new ブロウレジスト(3), new ブロウレジスト(4), new ブロウレジスト(5) };
@@ -311,7 +311,7 @@ namespace PSO2AddAbility
         public override IAbility GetInstanceOfLv(int lv) { return values[lv]; }
         public override IEnumerable<int> AllLevels() { return Enumerable.Range(1, 5); }
     }
-    public class ショックレジスト : Basic_up, IMutationAmplifiable
+    public class ショックレジスト : Basic_up, IMutationAmplifiable, ISoulAmplifiable<ウォルガ・ソール>
     {
         public ショックレジスト(int lv) { Level = lv; }
         private static ショックレジスト[] values = new ショックレジスト[] { null, new ショックレジスト(1), new ショックレジスト(2), new ショックレジスト(3), new ショックレジスト(4), new ショックレジスト(5) };
@@ -476,5 +476,26 @@ namespace PSO2AddAbility
         private static キャタ・ソール value = new キャタ・ソール();
         public static キャタ・ソール Get() { return value; }
         public override bool IsAmplifiableAbility(IAbility ab) { return ab is ISoulAmplifiable<キャタ・ソール>; }
+    }
+    public class ウォルガ・ソール : Soul
+    {
+        private ウォルガ・ソール() { }
+        private static ウォルガ・ソール value = new ウォルガ・ソール();
+        public static ウォルガ・ソール Get() { return value; }
+        public override bool IsAmplifiableAbility(IAbility ab) { return ab is ISoulAmplifiable<ウォルガ・ソール>; }
+    }
+    public class シュレイダ・ソール : Soul
+    {
+        private シュレイダ・ソール() { }
+        private static シュレイダ・ソール value = new シュレイダ・ソール();
+        public static シュレイダ・ソール Get() { return value; }
+        public override bool IsAmplifiableAbility(IAbility ab) { return ab is ISoulAmplifiable<シュレイダ・ソール>; }
+    }
+    public class エルダー・ソール : Soul
+    {
+        private エルダー・ソール() { }
+        private static エルダー・ソール value = new エルダー・ソール();
+        public static エルダー・ソール Get() { return value; }
+        public override bool IsAmplifiableAbility(IAbility ab) { return ab is ISoulAmplifiable<エルダー・ソール>; }
     }
 }

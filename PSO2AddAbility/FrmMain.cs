@@ -13,7 +13,7 @@ namespace PSO2AddAbility
     public partial class FrmMain : Form
     {
         //-------------------------------------------------------------------------------
-        #region Constructor  
+        #region Constructor
         //-------------------------------------------------------------------------------
         //
         public FrmMain()
