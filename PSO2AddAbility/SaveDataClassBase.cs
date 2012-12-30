@@ -36,7 +36,7 @@ namespace PSO2AddAbility
                     serializer.Serialize(writer, this);
                 }
             }
-            catch (Exception) { return false;}
+            catch (Exception) { return false; }
             return true;
         }
 

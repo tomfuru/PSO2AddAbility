@@ -61,7 +61,7 @@ namespace PSO2AddAbility
 
             int max_num = 0;
             int current_num = 0;
-            Action<int> max_report = (max) => 
+            Action<int> max_report = (max) =>
             {
                 Interlocked.Exchange(ref max_num, max);
                 this.Invoke((Action)(() => tsslSynthesisNumber.Text = string.Format("{0}/{1}", 0, max_num)));
@@ -115,9 +115,9 @@ namespace PSO2AddAbility
         {
             var nodes = synthesisweapons.Select((sw, i) =>
             {
-                var tn = new TreeNode(string.Format("case {0} {1} {2}", i + 1, Util.ProbabilityToString(sw.probabilities.Aggregate(1.0f, (f1, f2) => f1 *  f2)) ,sw.probabilities.Select(Util.ProbabilityToString).ToArray().AllToString('[', ']')));
+                var tn = new TreeNode(string.Format("case {0} {1} {2}", i + 1, Util.ProbabilityToString(sw.probabilities.Aggregate(1.0f, (f1, f2) => f1 * f2)), sw.probabilities.Select(Util.ProbabilityToString).ToArray().AllToString('[', ']')));
                 List<TreeNode> nodeList = new List<TreeNode>();
-                
+
                 TreeNode node0 = new TreeNode(sw.info0.Weapon.ToString());
                 node0.Tag = new NodeInfo() { synthesisWeapons = sw.info0.SynthesisInfo };
                 if (sw.info0.SynthesisInfo != null) { node0.Nodes.Add(""); } // Expandできるようにダミーノード追加
@@ -127,7 +127,7 @@ namespace PSO2AddAbility
                 node1.Tag = new NodeInfo() { synthesisWeapons = sw.info1.SynthesisInfo };
                 if (sw.info1.SynthesisInfo != null) { node1.Nodes.Add(""); } // Expandできるようにダミーノード追加
                 nodeList.Add(node1);
-                
+
                 if (sw.info2 != null) {
                     TreeNode node2 = new TreeNode(sw.info2.Weapon.ToString());
                     node2.Tag = new NodeInfo() { synthesisWeapons = sw.info2.SynthesisInfo };

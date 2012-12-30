@@ -55,7 +55,7 @@ namespace PSO2AddAbility
         private void btnOK_Click(object sender, EventArgs e)
         {
             ExtractAndSetAllItems();
-            bool b =ValueData.ValueDataDic.ContainsKey(SerializableTuple.Create(AbilityType.アーム, 1));
+            bool b = ValueData.ValueDataDic.ContainsKey(SerializableTuple.Create(AbilityType.アーム, 1));
 
             this.DialogResult = System.Windows.Forms.DialogResult.OK;
         }
@@ -76,7 +76,7 @@ namespace PSO2AddAbility
         //
         private void DisplayAllItems()
         {
-            Action<IAbility, int[]> append_values = (ab, vals) => 
+            Action<IAbility, int[]> append_values = (ab, vals) =>
             {
                 DataGridViewRow row = new DataGridViewRow();
                 row.HeaderCell.Value = ab.ToString();
@@ -86,7 +86,7 @@ namespace PSO2AddAbility
                 dataGridView1.Rows[index].SetValues(vals__);
                 dataGridView1.Rows[index].Tag = ab;
             };
-            Action<IAbility> append_default = ab => append_values(ab, new int [] { 0, 0, 0, 0, 0, 0, 0, 0, 0});
+            Action<IAbility> append_default = ab => append_values(ab, new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
 
             var dic = _valuedata.ValueDataDic;
             foreach (var ab in Data.ALL_ABILITIES) {

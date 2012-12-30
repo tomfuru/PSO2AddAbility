@@ -202,7 +202,7 @@ namespace PSO2AddAbility
         };
 
         /// <summary>[INH[2-3]]</summary>
-        public static readonly float[] PROB_SOUL = { NaN, NaN, NaN, 0.50f, 0.80f};
+        public static readonly float[] PROB_SOUL = { NaN, NaN, NaN, 0.50f, 0.80f };
 
         /// <summary>[(現在スロット),(素材数)]</summary>
         public static readonly float[,] PROB_CORRECTION_EXTRA = {

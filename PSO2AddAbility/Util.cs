@@ -60,12 +60,12 @@ namespace PSO2AddAbility
         #endregion (IEnumerable.Distinct)
 
         //-------------------------------------------------------------------------------
-        #region +[static]IsSoulAmplifiable 
+        #region +[static]IsSoulAmplifiable
         //-------------------------------------------------------------------------------
         //
         public static bool IsSoulAmplifiable<T>(IAbility ability, T soul) where T : Soul
         {
-            return (ability is ISoulAmplifiable<T>); 
+            return (ability is ISoulAmplifiable<T>);
         }
         #endregion (Name)
 

@@ -102,7 +102,7 @@ namespace PSO2AddAbility
 
         public override bool Equals(object obj)
         {
-            return  (_tuple != null && obj is SerializableTuple<T1, T2>) ? _tuple.Equals(obj as SerializableTuple<T1, T2>) : false;
+            return (_tuple != null && obj is SerializableTuple<T1, T2>) ? _tuple.Equals(obj as SerializableTuple<T1, T2>) : false;
         }
 
         public bool Equals(SerializableTuple<T1, T2> other)
@@ -124,7 +124,8 @@ namespace PSO2AddAbility
     //-------------------------------------------------------------------------------
     #region (Class)SerializableTuple
     //-------------------------------------------------------------------------------
-    public static class SerializableTuple {
+    public static class SerializableTuple
+    {
         //-------------------------------------------------------------------------------
         #region Create
         //-------------------------------------------------------------------------------
