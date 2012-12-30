@@ -1,6 +1,6 @@
 ﻿namespace PSO2AddAbility
 {
-    partial class WeaponAbilityInput
+    partial class WeaponAbilityInputComboBox
     {
         /// <summary> 
         /// 必要なデザイナー変数です。
@@ -119,7 +119,7 @@
             this.lblText.TabIndex = 8;
             this.lblText.Text = "...";
             // 
-            // WeaponAbilityInput
+            // WeaponAbilityInputComboBox
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -133,7 +133,7 @@
             this.Controls.Add(this.cboAbbility3);
             this.Controls.Add(this.cboAbbility2);
             this.Controls.Add(this.cboAbbility1);
-            this.Name = "WeaponAbilityInput";
+            this.Name = "WeaponAbilityInputComboBox";
             this.Size = new System.Drawing.Size(262, 128);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace PSO2AddAbility
 {
@@ -26,7 +27,7 @@ namespace PSO2AddAbility
         #endregion (ToString)
 
         //-------------------------------------------------------------------------------
-        #region IEnumerable.Distinct
+        #region +[extension:IEnumerable]IEnumerable.Distinct
         //-------------------------------------------------------------------------------
         /*private class MyEqualityComparer<T> : IEqualityComparer<T>
         {
@@ -98,5 +99,17 @@ namespace PSO2AddAbility
             return probabilities.Aggregate(1.0f, (f1, f2) => f1 * f2);
         }
         #endregion (AllProbability)
+
+        //-------------------------------------------------------------------------------
+        #region +[extension:ScrollBar]ScrollDelta
+        //-------------------------------------------------------------------------------
+        //
+        public static void ScrollDelta(this ScrollBar scr, int change)
+        {
+            int value = Math.Min(Math.Max(scr.Value + change, scr.Minimum), scr.Maximum);
+            scr.Value = value;
+            //scr.Value = value; // 2回しないとなぜか反応しない
+        }
+        #endregion (ScrollDelta)
     }
 }

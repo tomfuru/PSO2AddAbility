@@ -35,13 +35,14 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tsslText = new System.Windows.Forms.ToolStripStatusLabel();
             this.tsslSynthesisNumber = new System.Windows.Forms.ToolStripStatusLabel();
-            this.waInputCurrent = new PSO2AddAbility.WeaponAbilityInput();
-            this.waInputObjective = new PSO2AddAbility.WeaponAbilityInput();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.numSynFee2 = new System.Windows.Forms.NumericUpDown();
             this.numSynFee3 = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
+            this.waInputCurrent = new PSO2AddAbility.WeaponAbilityInputComboBox();
+            this.waInputObjective = new PSO2AddAbility.WeaponAbilityInputComboBox();
+            this.weaponAbilityInputButton1 = new PSO2AddAbility.WeaponAbilityInputCheckBox();
             this.tsmi価格設定.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numSynFee2)).BeginInit();
@@ -65,7 +66,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeViewResult.Location = new System.Drawing.Point(290, 32);
             this.treeViewResult.Name = "treeViewResult";
-            this.treeViewResult.Size = new System.Drawing.Size(292, 450);
+            this.treeViewResult.Size = new System.Drawing.Size(292, 475);
             this.treeViewResult.TabIndex = 1;
             this.treeViewResult.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeViewResult_BeforeExpand);
             // 
@@ -100,7 +101,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsslText,
             this.tsslSynthesisNumber});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 484);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 509);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(595, 23);
             this.statusStrip1.TabIndex = 5;
@@ -119,26 +120,6 @@
             this.tsslSynthesisNumber.Name = "tsslSynthesisNumber";
             this.tsslSynthesisNumber.Size = new System.Drawing.Size(20, 18);
             this.tsslSynthesisNumber.Text = "...";
-            // 
-            // waInputCurrent
-            // 
-            this.waInputCurrent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.waInputCurrent.IncludeGarbage = true;
-            this.waInputCurrent.Label = "現在武器";
-            this.waInputCurrent.Location = new System.Drawing.Point(12, 215);
-            this.waInputCurrent.Name = "waInputCurrent";
-            this.waInputCurrent.Size = new System.Drawing.Size(262, 128);
-            this.waInputCurrent.TabIndex = 3;
-            // 
-            // waInputObjective
-            // 
-            this.waInputObjective.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.waInputObjective.IncludeGarbage = false;
-            this.waInputObjective.Label = "目標武器";
-            this.waInputObjective.Location = new System.Drawing.Point(12, 81);
-            this.waInputObjective.Name = "waInputObjective";
-            this.waInputObjective.Size = new System.Drawing.Size(262, 128);
-            this.waInputObjective.TabIndex = 2;
             // 
             // label1
             // 
@@ -201,11 +182,41 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "3つ";
             // 
+            // waInputCurrent
+            // 
+            this.waInputCurrent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.waInputCurrent.IncludeGarbage = true;
+            this.waInputCurrent.Label = "現在武器";
+            this.waInputCurrent.Location = new System.Drawing.Point(12, 215);
+            this.waInputCurrent.Name = "waInputCurrent";
+            this.waInputCurrent.Size = new System.Drawing.Size(262, 128);
+            this.waInputCurrent.TabIndex = 3;
+            // 
+            // waInputObjective
+            // 
+            this.waInputObjective.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.waInputObjective.IncludeGarbage = false;
+            this.waInputObjective.Label = "目標武器";
+            this.waInputObjective.Location = new System.Drawing.Point(12, 81);
+            this.waInputObjective.Name = "waInputObjective";
+            this.waInputObjective.Size = new System.Drawing.Size(262, 128);
+            this.waInputObjective.TabIndex = 2;
+            // 
+            // weaponAbilityInputButton1
+            // 
+            this.weaponAbilityInputButton1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.weaponAbilityInputButton1.Label = "...";
+            this.weaponAbilityInputButton1.Location = new System.Drawing.Point(12, 378);
+            this.weaponAbilityInputButton1.Name = "weaponAbilityInputButton1";
+            this.weaponAbilityInputButton1.Size = new System.Drawing.Size(262, 128);
+            this.weaponAbilityInputButton1.TabIndex = 11;
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(595, 507);
+            this.ClientSize = new System.Drawing.Size(595, 532);
+            this.Controls.Add(this.weaponAbilityInputButton1);
             this.Controls.Add(this.numSynFee3);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.numSynFee2);
@@ -236,8 +247,8 @@
 
         private System.Windows.Forms.Button btnSynthesis;
         private System.Windows.Forms.TreeView treeViewResult;
-        private WeaponAbilityInput waInputObjective;
-        private WeaponAbilityInput waInputCurrent;
+        private WeaponAbilityInputComboBox waInputObjective;
+        private WeaponAbilityInputComboBox waInputCurrent;
         private System.Windows.Forms.MenuStrip tsmi価格設定;
         private System.Windows.Forms.ToolStripMenuItem tsmi設定;
         private System.Windows.Forms.StatusStrip statusStrip1;
@@ -249,6 +260,7 @@
         private System.Windows.Forms.NumericUpDown numSynFee2;
         private System.Windows.Forms.NumericUpDown numSynFee3;
         private System.Windows.Forms.Label label3;
+        private WeaponAbilityInputCheckBox weaponAbilityInputButton1;
     }
 }
 

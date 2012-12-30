@@ -67,17 +67,23 @@
     <Compile Include="SettingsData.cs" />
     <Compile Include="Synthesis.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="WeaponAbilityInput.cs">
+    <Compile Include="WeaponAbilityInputComboBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="WeaponAbilityInput.Designer.cs">
-      <DependentUpon>WeaponAbilityInput.cs</DependentUpon>
+    <Compile Include="WeaponAbilityInputComboBox.Designer.cs">
+      <DependentUpon>WeaponAbilityInputComboBox.cs</DependentUpon>
     </Compile>
     <Compile Include="FrmConfigValue.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FrmConfigValue.Designer.cs">
       <DependentUpon>FrmConfigValue.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WeaponAbilityInputCheckBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WeaponAbilityInputCheckBox.Designer.cs">
+      <DependentUpon>WeaponAbilityInputCheckBox.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="FrmConfig.resx">
       <DependentUpon>FrmConfig.cs</DependentUpon>
@@ -94,8 +100,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="WeaponAbilityInput.resx">
-      <DependentUpon>WeaponAbilityInput.cs</DependentUpon>
+    <EmbeddedResource Include="WeaponAbilityInputCheckBox.resx">
+      <DependentUpon>WeaponAbilityInputCheckBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WeaponAbilityInputComboBox.resx">
+      <DependentUpon>WeaponAbilityInputComboBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmConfigValue.resx">
       <DependentUpon>FrmConfigValue.cs</DependentUpon>

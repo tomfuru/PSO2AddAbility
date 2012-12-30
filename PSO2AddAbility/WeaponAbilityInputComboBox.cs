@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace PSO2AddAbility
 {
-    public partial class WeaponAbilityInput : UserControl
+    public partial class WeaponAbilityInputComboBox : UserControl
     {
         private readonly ComboBox[] ABILITY_COMBOBOXES;
 
@@ -18,7 +18,7 @@ namespace PSO2AddAbility
         #region Constructor
         //-------------------------------------------------------------------------------
         //
-        public WeaponAbilityInput()
+        public WeaponAbilityInputComboBox()
         {
             InitializeComponent();
 
