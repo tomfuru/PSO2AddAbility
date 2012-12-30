@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PSO2AddAbility
 {
@@ -61,12 +63,23 @@ namespace PSO2AddAbility
         #endregion ( -(class)AbilityInfo)
 
         /// <summary>メモ化用キャッシュ</summary>
-        private static Dictionary<Weapon, SynthesisWeapons[]> winfo_cache = new Dictionary<Weapon, SynthesisWeapons[]>();
+        //private static Dictionary<Weapon, SynthesisWeapons[]> winfo_cache = new Dictionary<Weapon, SynthesisWeapons[]>();
+        private static ConcurrentDictionary<Weapon, SynthesisWeapons[]> winfo_cache = new ConcurrentDictionary<Weapon, SynthesisWeapons[]>();
         //-------------------------------------------------------------------------------
         #region +Synthesize
         //-------------------------------------------------------------------------------
         //
-        public static SynthesisWeapons[] Synthesize(Weapon objective, bool isMaterial)
+        public static SynthesisWeapons[] Synthesize(Weapon objective, bool isParallel, Action<int> reportCombNum, Action reportFinOneComb)
+        {
+            return SynthesizeInternal(objective, false, isParallel, reportCombNum, reportFinOneComb, true);
+        }
+        #endregion (Synthesize)
+
+        //-------------------------------------------------------------------------------
+        #region SynthesizeInternal
+        //-------------------------------------------------------------------------------
+        //
+        private static SynthesisWeapons[] SynthesizeInternal(Weapon objective, bool isMaterial, bool isParallel, Action<int> reportCombNum, Action reportFinOneComb, bool isTopLevel)
         {
             if (winfo_cache.ContainsKey(objective)) { // 今まであったものなら参照
                 return winfo_cache[objective];
@@ -83,6 +96,7 @@ namespace PSO2AddAbility
             // 候補->全能力[全能力->1能力の必要能力[1能力の必要能力->能力]]
             List<IEnumerable<IEnumerable<IAbility>>> combinations = ListCombinations(need_materials);
 
+            if (isTopLevel && reportCombNum != null) reportCombNum(combinations.Count);
 
             List<SynthesisWeapons> sw_list = new List<SynthesisWeapons>();
             // 各素材の組み合わせについて合成方法を調べる
@@ -123,15 +137,15 @@ namespace PSO2AddAbility
 
                     WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() {
                         Weapon = combweapon[0],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[0])) ? null : Synthesize(combweapon[0], false)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[0])) ? null : SynthesizeInternal(combweapon[0], false, false, reportCombNum, reportFinOneComb, false)
                     };
                     WeaponSynthesisInfo info1 = new WeaponSynthesisInfo() {
                         Weapon = combweapon[1],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[1])) ? null : Synthesize(combweapon[1], true)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[1])) ? null : SynthesizeInternal(combweapon[1], true, false, reportCombNum, reportFinOneComb, false)
                     };
                     WeaponSynthesisInfo info2 = (three_weapons) ? new WeaponSynthesisInfo() {
                         Weapon = combweapon[2],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[2])) ? null : Synthesize(combweapon[2], true)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[2])) ? null : SynthesizeInternal(combweapon[2], true, false, reportCombNum, reportFinOneComb, false)
                     }
                     : null;
 
@@ -145,58 +159,42 @@ namespace PSO2AddAbility
                     return sw;
                 };
 
-                // 3本，(目的能力数)の合成で行う場合
-                foreach (var co in Assignments(3, num_slot, elements)) {
-                    if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
-                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
+                Action<Weapon[]> synthesisComb = (co) =>
+                {
+                    if (objective.Equals(co[0])) { return; } // 目標武器に目標能力がついていたら意味がない
+                    if (isMaterial && (objective.Equals(co[1]) || (co.Length > 2 && objective.Equals(co[2])))) { return; } // 素材を作成している場合素材にその能力がついていたら意味がない
 
                     var sw = synthesis(co);
                     sw_list.Add(sw);
+                };
 
-                    /*
-                    // デバッグ用表示
-                    Console.WriteLine("---");
-                    foreach (var ab in co) {
-                        Console.WriteLine(ab.abilities.AllToString());
+                var assinedComb = Assignments(3, num_slot, elements)            // 3本，目的能力数同士の合成
+                              .Concat(Assignments(3, num_slot - 1, elements))   // 3本，目的能力数-1同士の合成
+                              .Concat(Assignments(2, num_slot, elements))       // 2本，目的能力数同士の合成
+                              .Concat(Assignments(2, num_slot - 1, elements))   // 2本，目的能力数-1同士の合成
+                              .ToArray();
+
+                if (isParallel) { // パラレル
+                    Parallel.ForEach(assinedComb, synthesisComb);
+                }
+                else { // シーケンシャル
+                    foreach (var co in assinedComb) {
+                        synthesisComb(co);
                     }
-                    */
-                }
-                
-                // 3本，(目的能力数)-1の合成で行う場合
-                foreach (var co in Assignments(3, num_slot - 1, elements)) {
-                    if (isMaterial && (objective.Equals(co[1]) || objective.Equals(co[2]))) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
-
-                    var sw = synthesis(co);
-                    sw_list.Add(sw);
                 }
 
-                // 2本，(目的能力数)の合成で行う場合
-                foreach (var co in Assignments(2, num_slot, elements)) {
-                    if (objective.Equals(co[0])) { continue; } // 目標武器に目標能力がついていたら意味がない
-                    if (isMaterial && objective.Equals(co[1])) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
-
-                    var sw = synthesis(co);
-                    sw_list.Add(sw);
-                }
-
-                // 2本，(目的能力数)-1の合成で行う場合
-                foreach (var co in Assignments(2, num_slot - 1, elements)) {
-                    if (isMaterial && objective.Equals(co[1])) { continue; } // 素材を作成している場合素材にその能力がついていたら意味がない
-
-                    var sw = synthesis(co);
-                    sw_list.Add(sw);
-                }
+                if (isTopLevel && reportFinOneComb != null) reportFinOneComb();
             }
 
             SynthesisWeapons[] ret = sw_list.ToArray();
             if (!winfo_cache.ContainsKey(objective)) {
-                winfo_cache.Add(objective, ret);
+                //winfo_cache.Add(objective, ret);
+                winfo_cache.TryAdd(objective, ret);
             }
 
             return ret;
-
         }
-        #endregion (Synthesize)
+        #endregion (SynthesizeInternal)
 
         //-------------------------------------------------------------------------------
         #region -Assignments 特殊能力の振り分けリスト

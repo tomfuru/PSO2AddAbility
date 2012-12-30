@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,6 +14,9 @@ namespace PSO2AddAbility
 {
     public partial class FrmMain : Form
     {
+        private SettingsData _settings;
+        private const string SETTINGS_FILENAME = "PSO2AddAbilitySettings.dat";
+
         //-------------------------------------------------------------------------------
         #region Constructor
         //-------------------------------------------------------------------------------
@@ -19,18 +24,60 @@ namespace PSO2AddAbility
         public FrmMain()
         {
             InitializeComponent();
+
+            tsslText.Text = tsslSynthesisNumber.Text = "";
+            _settings = SettingsData.Restore(SETTINGS_FILENAME) ?? new SettingsData();
         }
         #endregion (Constructor)
+
+        //-------------------------------------------------------------------------------
+        #region FrmMain_FormClosed
+        //-------------------------------------------------------------------------------
+        //
+        private void FrmMain_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _settings.Save(SETTINGS_FILENAME);
+        }
+        #endregion (FrmMain_FormClosed)
 
         //-------------------------------------------------------------------------------
         #region btnSynthesis_Click 合成ボタン
         //-------------------------------------------------------------------------------
         //
-        private void btnSynthesis_Click(object sender, EventArgs e)
+        private async void btnSynthesis_Click(object sender, EventArgs e)
         {
             Weapon w = new Weapon(waInputObjective.GetAbilities().ToArray());
 
-            var result = Synthesis.Synthesize(w, false);
+            CancellationTokenSource cts = new CancellationTokenSource();
+            var sresult = Task.Factory.StartNew((() =>
+            {
+                Stopwatch sw = Stopwatch.StartNew();
+                while (!cts.Token.IsCancellationRequested) {
+                    this.Invoke((Action)(() => tsslText.Text = string.Format("{0}秒経過．．．", sw.ElapsedMilliseconds / 1000)));
+                    Thread.Sleep(100);
+                }
+                return sw.ElapsedMilliseconds / 1000;
+            }), cts.Token);
+
+            int max_num = 0;
+            int current_num = 0;
+            Action<int> max_report = (max) => 
+            {
+                Interlocked.Exchange(ref max_num, max);
+                this.Invoke((Action)(() => tsslSynthesisNumber.Text = string.Format("{0}/{1}", 0, max_num)));
+            };
+            Action finOne_report = () =>
+            {
+                Interlocked.Increment(ref current_num);
+                this.Invoke((Action)(() => tsslSynthesisNumber.Text = string.Format("{0}/{1}", current_num, max_num)));
+            };
+
+
+            var result = await Task.Run(() => Synthesis.Synthesize(w, false, max_report, finOne_report));
+
+            cts.Cancel();
+            tsslText.Text = string.Format("候補の列挙が完了しました！({0}秒かかりました)", sresult.Result);
+
             displayWeaponSynthesisDynamically_first(w, result);
         }
         #endregion (btnSynthesis_Click)
@@ -52,6 +99,8 @@ namespace PSO2AddAbility
         //
         private void displayWeaponSynthesisDynamically_first(Weapon weapon, SynthesisWeapons[] synthesisweapons)
         {
+            treeViewResult.Nodes.Clear();
+
             TreeNode node = new TreeNode(weapon.ToString());
             displayWeaponSynthesisDynamically(node, synthesisweapons);
             treeViewResult.Nodes.Add(node);
@@ -111,11 +160,29 @@ namespace PSO2AddAbility
         }
         #endregion (treeViewResult_BeforeExpand)
 
+        //-------------------------------------------------------------------------------
+        #region tsmi設定_Click
+        //-------------------------------------------------------------------------------
+        //
         private void tsmi設定_Click(object sender, EventArgs e)
         {
-
+            using (FrmConfig frm = new FrmConfig()) {
+                frm.ShowDialog(this);
+            }
         }
-
+        #endregion (tsmi設定_Click)
+        //-------------------------------------------------------------------------------
+        #region tsmiConfigValue_Click
+        //-------------------------------------------------------------------------------
+        //
+        private void tsmiConfigValue_Click(object sender, EventArgs e)
+        {
+            using (FrmConfigValue frm = new FrmConfigValue()) {
+                frm.ValueData = _settings.ValueData;
+                frm.ShowDialog(this);
+            }
+        }
+        #endregion (tsmiConfigValue_Click)
 
         //-------------------------------------------------------------------------------
         #region (commented out)

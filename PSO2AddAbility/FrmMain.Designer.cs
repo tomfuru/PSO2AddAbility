@@ -29,11 +29,16 @@
         {
             this.btnSynthesis = new System.Windows.Forms.Button();
             this.treeViewResult = new System.Windows.Forms.TreeView();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.tsmi価格設定 = new System.Windows.Forms.MenuStrip();
+            this.tsmi設定 = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.tsslText = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tsslSynthesisNumber = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tsmiConfigValue = new System.Windows.Forms.ToolStripMenuItem();
             this.waInputCurrent = new PSO2AddAbility.WeaponAbilityInput();
             this.waInputObjective = new PSO2AddAbility.WeaponAbilityInput();
-            this.tsmi設定 = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuStrip1.SuspendLayout();
+            this.tsmi価格設定.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnSynthesis
@@ -50,20 +55,60 @@
             // 
             this.treeViewResult.Location = new System.Drawing.Point(290, 32);
             this.treeViewResult.Name = "treeViewResult";
-            this.treeViewResult.Size = new System.Drawing.Size(292, 470);
+            this.treeViewResult.Size = new System.Drawing.Size(292, 450);
             this.treeViewResult.TabIndex = 1;
             this.treeViewResult.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeViewResult_BeforeExpand);
             // 
-            // menuStrip1
+            // tsmi価格設定
             // 
-            this.menuStrip1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmi設定});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(595, 26);
-            this.menuStrip1.TabIndex = 4;
-            this.menuStrip1.Text = "menuStrip1";
+            this.tsmi価格設定.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.tsmi価格設定.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmi設定,
+            this.tsmiConfigValue});
+            this.tsmi価格設定.Location = new System.Drawing.Point(0, 0);
+            this.tsmi価格設定.Name = "tsmi価格設定";
+            this.tsmi価格設定.Size = new System.Drawing.Size(595, 26);
+            this.tsmi価格設定.TabIndex = 4;
+            this.tsmi価格設定.Text = "menuStrip1";
+            // 
+            // tsmi設定
+            // 
+            this.tsmi設定.Name = "tsmi設定";
+            this.tsmi設定.Size = new System.Drawing.Size(62, 22);
+            this.tsmi設定.Text = "設定(C)";
+            this.tsmi設定.Click += new System.EventHandler(this.tsmi設定_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsslText,
+            this.tsslSynthesisNumber});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 484);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(595, 23);
+            this.statusStrip1.TabIndex = 5;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // tsslText
+            // 
+            this.tsslText.Name = "tsslText";
+            this.tsslText.Size = new System.Drawing.Size(560, 18);
+            this.tsslText.Spring = true;
+            this.tsslText.Text = "...";
+            this.tsslText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // tsslSynthesisNumber
+            // 
+            this.tsslSynthesisNumber.Name = "tsslSynthesisNumber";
+            this.tsslSynthesisNumber.Size = new System.Drawing.Size(20, 18);
+            this.tsslSynthesisNumber.Text = "...";
+            // 
+            // tsmiConfigValue
+            // 
+            this.tsmiConfigValue.Name = "tsmiConfigValue";
+            this.tsmiConfigValue.Size = new System.Drawing.Size(86, 22);
+            this.tsmiConfigValue.Text = "価格設定(&V)";
+            this.tsmiConfigValue.Click += new System.EventHandler(this.tsmiConfigValue_Click);
             // 
             // waInputCurrent
             // 
@@ -85,28 +130,25 @@
             this.waInputObjective.Size = new System.Drawing.Size(262, 128);
             this.waInputObjective.TabIndex = 2;
             // 
-            // tsmi設定
-            // 
-            this.tsmi設定.Name = "tsmi設定";
-            this.tsmi設定.Size = new System.Drawing.Size(62, 22);
-            this.tsmi設定.Text = "設定(C)";
-            this.tsmi設定.Click += new System.EventHandler(this.tsmi設定_Click);
-            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(595, 507);
+            this.Controls.Add(this.treeViewResult);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.waInputCurrent);
             this.Controls.Add(this.waInputObjective);
-            this.Controls.Add(this.treeViewResult);
             this.Controls.Add(this.btnSynthesis);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
+            this.Controls.Add(this.tsmi価格設定);
+            this.MainMenuStrip = this.tsmi価格設定;
             this.Name = "FrmMain";
             this.Text = "PSO2AddAbility";
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmMain_FormClosed);
+            this.tsmi価格設定.ResumeLayout(false);
+            this.tsmi価格設定.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -118,8 +160,12 @@
         private System.Windows.Forms.TreeView treeViewResult;
         private WeaponAbilityInput waInputObjective;
         private WeaponAbilityInput waInputCurrent;
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.MenuStrip tsmi価格設定;
         private System.Windows.Forms.ToolStripMenuItem tsmi設定;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel tsslText;
+        private System.Windows.Forms.ToolStripStatusLabel tsslSynthesisNumber;
+        private System.Windows.Forms.ToolStripMenuItem tsmiConfigValue;
     }
 }
 
