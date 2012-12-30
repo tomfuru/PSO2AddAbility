@@ -51,9 +51,9 @@ namespace PSO2AddAbility
         {
             if (ability is Basic_up || ability is Additional) {
                 // (元の能力*1,2,3) or (一つ下の能力*2,3)
-                yield return new[] { ability };
-                yield return new[] { ability, ability };
                 yield return new[] { ability, ability, ability };
+                yield return new[] { ability, ability };
+                yield return new[] { ability };
 
                 ILevel ability_l = ability as ILevel;
                 int level = ability_l.Level;
@@ -61,23 +61,23 @@ namespace PSO2AddAbility
                 if (level > 1) {
                     //IAbility ab = Activator.CreateInstance(ability.GetType(), level - 1) as IAbility; 下に代替
                     IAbility ab = ability_l.GetInstanceOfLv(level - 1);
-                    yield return new[] { ab, ab };
                     yield return new[] { ab, ab, ab };
+                    yield return new[] { ab, ab };
                 }
             }
             else if (ability is Ability) {
-                // (元の能力*1,2,3) or (パワー,シュート,テクニック各1)
-                yield return new[] { ability };
-                yield return new[] { ability, ability };
-                yield return new[] { ability, ability, ability };
-
+                // (パワー,シュート,テクニック各1) or (元の能力*1,2,3)
                 int level = ((ILevel)ability).Level;
                 yield return new IAbility[] { パワー.GetLv(level), シュート.GetLv(level), テクニック.GetLv(level) };
+
+                yield return new[] { ability, ability, ability };
+                yield return new[] { ability, ability };
+                yield return new[] { ability };
             }
             else if (ability is Soul || ability is Special_up) {
                 // (元の能力*2,3)
-                yield return new[] { ability, ability };
                 yield return new[] { ability, ability, ability };
+                yield return new[] { ability, ability };
             }
 
             yield break;

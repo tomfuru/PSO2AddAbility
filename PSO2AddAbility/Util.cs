@@ -78,5 +78,25 @@ namespace PSO2AddAbility
             return ((int)(f * 100)).ToString() + '%';
         }
         #endregion (ProbabilityToString)
+
+        //-------------------------------------------------------------------------------
+        #region +[static]CostToString コストを文字列に
+        //-------------------------------------------------------------------------------
+        //
+        public static string CostToString(double cost)
+        {
+            return Double.IsNaN(cost) ? "コスト不明" : ((long)cost).ToString() + "メセタ";
+        }
+        #endregion (CostToString)
+
+        //-------------------------------------------------------------------------------
+        #region +[static]AllProbability 全てが成功する確率
+        //-------------------------------------------------------------------------------
+        //
+        public static float AllProbability(float[] probabilities)
+        {
+            return probabilities.Aggregate(1.0f, (f1, f2) => f1 * f2);
+        }
+        #endregion (AllProbability)
     }
 }

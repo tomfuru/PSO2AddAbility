@@ -8,14 +8,18 @@ using System.Threading.Tasks;
 
 namespace PSO2AddAbility
 {
+    /// <summary>武器を作るための(複数の)合成情報</summary>
     public class WeaponSynthesisInfo
     {
+        public double Cost;
         public Weapon Weapon;
         public SynthesisWeapons[] SynthesisInfo;
     }
 
+    /// <summary>一つの合成の情報</summary>
     public class SynthesisWeapons
     {
+        public double cost;
         public float[] probabilities;
         public WeaponSynthesisInfo info0;
         public WeaponSynthesisInfo info1;
@@ -47,6 +51,35 @@ namespace PSO2AddAbility
         private Synthesis() { }
 
         //-------------------------------------------------------------------------------
+        #region (Class)SynthesisGeneralInfo
+        //-------------------------------------------------------------------------------
+        public class SynthesisGeneralInfo
+        {
+            public int Material_Synthesis_2weapons { get; private set; }
+            public int Material_Synthesis_3weapons { get; private set; }
+            public int Synthesis_2weapons { get; private set; }
+            public int Synthesis_3weapons { get; private set; }
+            public ValueData ValueData { get; private set; }
+
+            //-------------------------------------------------------------------------------
+            #region Constructor
+            //-------------------------------------------------------------------------------
+            public SynthesisGeneralInfo(SettingsData settings, int synthesis_2, int synthesis_3)
+            {
+                this.Material_Synthesis_2weapons = settings.Material_Synthesis_2weapons;
+                this.Material_Synthesis_3weapons = settings.Material_Synthesis_3weapons;
+                this.ValueData = settings.ValueData;
+
+                this.Synthesis_2weapons = synthesis_2;
+                this.Synthesis_3weapons = synthesis_3;
+            }
+            //-------------------------------------------------------------------------------
+            #endregion (Constructor)
+        }
+        //-------------------------------------------------------------------------------
+        #endregion (SynthesisGeneralInfo)
+
+        //-------------------------------------------------------------------------------
         #region  -(class)AbilityInfo
         //-------------------------------------------------------------------------------
         private class AbilityInfo
@@ -69,28 +102,30 @@ namespace PSO2AddAbility
         #region +Synthesize
         //-------------------------------------------------------------------------------
         //
-        public static SynthesisWeapons[] Synthesize(Weapon objective, bool isParallel, Action<int> reportCombNum, Action reportFinOneComb)
+        public static SynthesisWeapons[] Synthesize(Weapon objective, bool isParallel, SynthesisGeneralInfo synInfo, Action<int> reportCombNum, Action reportFinOneComb)
         {
-            return SynthesizeInternal(objective, false, isParallel, reportCombNum, reportFinOneComb, true);
+            return SynthesizeInternal(objective, false, isParallel, synInfo, reportCombNum, reportFinOneComb, true);
         }
         #endregion (Synthesize)
-
         //-------------------------------------------------------------------------------
-        #region SynthesizeInternal
+        #region -SynthesizeInternal
         //-------------------------------------------------------------------------------
         //
-        private static SynthesisWeapons[] SynthesizeInternal(Weapon objective, bool isMaterial, bool isParallel, Action<int> reportCombNum, Action reportFinOneComb, bool isTopLevel)
+        private static SynthesisWeapons[] SynthesizeInternal(Weapon objective, bool isMaterial, bool isParallel, SynthesisGeneralInfo synInfo, Action<int> reportCombNum, Action reportFinOneComb, bool isTopLevel)
         {
             if (winfo_cache.ContainsKey(objective)) { // 今まであったものなら参照
                 return winfo_cache[objective];
             }
-            else if (IsBasicWeapon(objective)) { // BasicWeaponならそれ以上探さない
+            else if (IsBasicWeapon(objective, isMaterial)) { // BasicWeaponならそれ以上探さない
                 return null;
+            }
+            else if (objective.All(iab => iab is ゴミ)) {
+                return SynthesizeToIncreaseSlotNum(objective, synInfo);
             }
 
             int num_slot = objective.AbilityNum;
             // 必要な素材能力の候補リストを取得
-            var need_materials = objective.Select(Data.GetMaterialAbilities).ToArray();
+            var need_materials = objective.Where(iab => !(iab is ゴミ)).Select(Data.GetMaterialAbilities).ToArray();
 
             // 1能力に必要な能力が複数ある(パワーⅢはパワーⅡ*2でも3でも作れる等)ため，それらの候補のすべての組み合わせリストを取得
             // 候補->全能力[全能力->1能力の必要能力[1能力の必要能力->能力]]
@@ -137,23 +172,31 @@ namespace PSO2AddAbility
 
                     WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() {
                         Weapon = combweapon[0],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[0])) ? null : SynthesizeInternal(combweapon[0], false, false, reportCombNum, reportFinOneComb, false)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[0], false)) ? null : SynthesizeInternal(combweapon[0], false, false, synInfo, reportCombNum, reportFinOneComb, false)
                     };
+                    info0.Cost = GetCostOfWeapon(info0.Weapon, info0.SynthesisInfo, synInfo);
                     WeaponSynthesisInfo info1 = new WeaponSynthesisInfo() {
                         Weapon = combweapon[1],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[1])) ? null : SynthesizeInternal(combweapon[1], true, false, reportCombNum, reportFinOneComb, false)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[1], true)) ? null : SynthesizeInternal(combweapon[1], true, false, synInfo, reportCombNum, reportFinOneComb, false)
                     };
+                    info1.Cost = GetCostOfWeapon(info1.Weapon, info1.SynthesisInfo, synInfo);
                     WeaponSynthesisInfo info2 = (three_weapons) ? new WeaponSynthesisInfo() {
                         Weapon = combweapon[2],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[2])) ? null : SynthesizeInternal(combweapon[2], true, false, reportCombNum, reportFinOneComb, false)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[2], true)) ? null : SynthesizeInternal(combweapon[2], true, false, synInfo, reportCombNum, reportFinOneComb, false)
                     }
                     : null;
+                    if (info2 != null) { info2.Cost = GetCostOfWeapon(info2.Weapon, info2.SynthesisInfo, synInfo); }
+
+                    double cost_weapons = info0.Cost + info1.Cost + ((info2 == null) ? 0.0d : info2.Cost);
+                    int cost_synthesis = (info2 == null) ? (isMaterial ? synInfo.Material_Synthesis_2weapons : synInfo.Synthesis_2weapons)
+                                                         : (isMaterial ? synInfo.Material_Synthesis_3weapons : synInfo.Synthesis_3weapons);
 
                     SynthesisWeapons sw = new SynthesisWeapons() {
                         info0 = info0,
                         info1 = info1,
                         info2 = info2,
-                        probabilities = probs
+                        probabilities = probs,
+                        cost = (cost_weapons + cost_synthesis) / probs.Aggregate(1.0f, (f1, f2) => f1 * f2)
                     };
 
                     return sw;
@@ -195,6 +238,80 @@ namespace PSO2AddAbility
             return ret;
         }
         #endregion (SynthesizeInternal)
+        //-------------------------------------------------------------------------------
+        #region -SynthesizeToIncreaseSlotNum
+        //-------------------------------------------------------------------------------
+        //
+        private static SynthesisWeapons[] SynthesizeToIncreaseSlotNum(Weapon objective, SynthesisGeneralInfo synInfo)
+        {
+            if (objective.AbilityNum == 0) { return null; } 
+
+            Debug.Assert(objective.All(iab => iab is ゴミ));
+
+            bool three = (objective.AbilityNum >= 2);
+
+            Weapon weapon = new Weapon(Enumerable.Repeat(ゴミ.Get(), objective.AbilityNum - 1).ToArray());
+
+            WeaponSynthesisInfo info = new WeaponSynthesisInfo() {
+                Weapon = weapon,
+                SynthesisInfo = SynthesizeToIncreaseSlotNum(weapon, synInfo),
+            };
+            info.Cost = GetCostOfWeapon(info.Weapon, info.SynthesisInfo, synInfo);
+
+            Weapon weaponM = (three) ? weapon : new Weapon(ゴミ.Get());
+            WeaponSynthesisInfo infoM = new WeaponSynthesisInfo() {
+                Weapon = weaponM,
+                SynthesisInfo = null
+            };
+            infoM.Cost = GetCostOfWeapon(infoM.Weapon, infoM.SynthesisInfo, synInfo);
+
+            float[] probabilities = GetProbabilities(objective, weapon, weaponM, (three) ? weaponM : null);
+            double cost = ((three) ? (info.Cost + infoM.Cost * 2 + synInfo.Synthesis_3weapons) : (info.Cost + infoM.Cost + synInfo.Synthesis_2weapons)) / Util.AllProbability(probabilities);
+
+            return new SynthesisWeapons[] {
+                new SynthesisWeapons() { 
+                        info0 = info,
+                        info1 = infoM,
+                        info2 = (three) ? infoM : null,
+                        probabilities = probabilities,
+                        cost = cost
+                }
+            };
+        }
+        #endregion (SynthesizeToIncreaseSlotNum)
+        //-------------------------------------------------------------------------------
+        #region -GetCostOfWeapon
+        //-------------------------------------------------------------------------------
+        //
+        private static double GetCostOfWeapon(Weapon weapon, SynthesisWeapons[] synweps, SynthesisGeneralInfo synInfo)
+        {
+            if (synweps != null) {
+                return synweps.Where(swp => !Double.IsNaN(swp.cost))
+                                            .Min(swp => swp.cost);
+            }
+            else {
+                IAbility ab = weapon.FirstOrDefault(iab => !(iab is ゴミ));
+                int ability_num = weapon.AbilityNum;
+                if (ab == null) {
+                    return synInfo.ValueData.GarbageValues[ability_num];
+                }
+                else {
+                    SerializableTuple<AbilityType, int> tuple;
+                    if (ab is ILevel) {
+                        ILevel ab_lv = ab as ILevel;
+                        tuple = SerializableTuple.Create(Data.DIC_IABILITY_TO_ABILITYTYPE[ab_lv.GetInstanceOfLv(1)], ab_lv.Level);
+                    }
+                    else {
+                        tuple = SerializableTuple.Create(Data.DIC_IABILITY_TO_ABILITYTYPE[ab], 0);
+                    }
+
+                    return (synInfo.ValueData.ValueDataDic.ContainsKey(tuple))
+                            ? synInfo.ValueData.ValueDataDic[tuple][ability_num]
+                            : Double.NaN;
+                }
+            }
+        }
+        #endregion (GetCostOfWeapon)
 
         //-------------------------------------------------------------------------------
         #region -Assignments 特殊能力の振り分けリスト
@@ -240,12 +357,16 @@ namespace PSO2AddAbility
         #region +IsBasicWeapon
         //-------------------------------------------------------------------------------
         //
-        public static bool IsBasicWeapon(Weapon weapon)
+        public static bool IsBasicWeapon(Weapon weapon, bool isMaterial)
         {
             int garbage_num = weapon.Count(ab => ab is ゴミ);
 
-            if (garbage_num >= weapon.AbilityNum - 1) { return true; }
-
+            if (isMaterial) {
+                if (garbage_num >= weapon.AbilityNum - 1) { return true; }
+            }
+            else {
+                if (weapon.AbilityNum == 0) { return true; }
+            }
             return false;
         }
         #endregion (IsBasicWeapon)
@@ -319,6 +440,7 @@ namespace PSO2AddAbility
         public static float GetProbability(IAbility objective, Weapon weapon1, Weapon weapon2, Weapon weapon3 = null)
         {
             IEnumerable<Weapon> weapons = (new Weapon[] { weapon1, weapon2, weapon3 }).Where(w => w != null);
+            if (objective is ゴミ) { return 1.00f; }
             if (objective is Boost) { return 1.00f; }
             if (objective is Soul || objective is Special_up) {
                 int num = weapons.Count(weapon => weapon.ContainsAbility(objective));

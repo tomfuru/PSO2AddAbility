@@ -72,8 +72,9 @@ namespace PSO2AddAbility
                 this.Invoke((Action)(() => tsslSynthesisNumber.Text = string.Format("{0}/{1}", current_num, max_num)));
             };
 
+            var synInfo = new Synthesis.SynthesisGeneralInfo(_settings, (int)numSynFee2.Value, (int)numSynFee3.Value);
 
-            var result = await Task.Run(() => Synthesis.Synthesize(w, false, max_report, finOne_report));
+            var result = await Task.Run(() => Synthesis.Synthesize(w, false, synInfo, max_report, finOne_report));
 
             cts.Cancel();
             tsslText.Text = string.Format("候補の列挙が完了しました！({0}秒かかりました)", sresult.Result);
@@ -115,21 +116,21 @@ namespace PSO2AddAbility
         {
             var nodes = synthesisweapons.Select((sw, i) =>
             {
-                var tn = new TreeNode(string.Format("case {0} {1} {2}", i + 1, Util.ProbabilityToString(sw.probabilities.Aggregate(1.0f, (f1, f2) => f1 * f2)), sw.probabilities.Select(Util.ProbabilityToString).ToArray().AllToString('[', ']')));
+                var tn = new TreeNode(string.Format("case{0} 【{1}】 {2} {3}", i + 1, Util.CostToString(sw.cost), Util.ProbabilityToString(sw.probabilities.Aggregate(1.0f, (f1, f2) => f1 * f2)), sw.probabilities.Select(Util.ProbabilityToString).ToArray().AllToString('[', ']')));
                 List<TreeNode> nodeList = new List<TreeNode>();
 
-                TreeNode node0 = new TreeNode(sw.info0.Weapon.ToString());
+                TreeNode node0 = new TreeNode(string.Format("{0} 【{1}】", sw.info0.Weapon.ToString(), Util.CostToString(sw.info0.Cost)));
                 node0.Tag = new NodeInfo() { synthesisWeapons = sw.info0.SynthesisInfo };
                 if (sw.info0.SynthesisInfo != null) { node0.Nodes.Add(""); } // Expandできるようにダミーノード追加
                 nodeList.Add(node0);
 
-                TreeNode node1 = new TreeNode(sw.info1.Weapon.ToString());
+                TreeNode node1 = new TreeNode(string.Format("{0} 【{1}】", sw.info1.Weapon.ToString(), Util.CostToString(sw.info1.Cost)));
                 node1.Tag = new NodeInfo() { synthesisWeapons = sw.info1.SynthesisInfo };
                 if (sw.info1.SynthesisInfo != null) { node1.Nodes.Add(""); } // Expandできるようにダミーノード追加
                 nodeList.Add(node1);
 
                 if (sw.info2 != null) {
-                    TreeNode node2 = new TreeNode(sw.info2.Weapon.ToString());
+                    TreeNode node2 = new TreeNode(string.Format("{0} 【{1}】", sw.info2.Weapon.ToString(), Util.CostToString(sw.info2.Cost)));
                     node2.Tag = new NodeInfo() { synthesisWeapons = sw.info2.SynthesisInfo };
                     if (sw.info2.SynthesisInfo != null) { node2.Nodes.Add(""); } // Expandできるようにダミーノード追加
                     nodeList.Add(node2);
@@ -179,7 +180,9 @@ namespace PSO2AddAbility
         {
             using (FrmConfigValue frm = new FrmConfigValue()) {
                 frm.ValueData = _settings.ValueData;
-                frm.ShowDialog(this);
+                if (frm.ShowDialog(this) == System.Windows.Forms.DialogResult.OK) {
+                    _settings.Save(SETTINGS_FILENAME);
+                }
             }
         }
         #endregion (tsmiConfigValue_Click)

@@ -29,7 +29,7 @@
         {
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCansel = new System.Windows.Forms.Button();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dgwValues = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -38,7 +38,7 @@
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgwValues)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOK
@@ -63,16 +63,16 @@
             this.btnCansel.UseVisualStyleBackColor = true;
             this.btnCansel.Click += new System.EventHandler(this.btnCansel_Click);
             // 
-            // dataGridView1
+            // dgwValues
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.AllowUserToResizeRows = false;
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.dgwValues.AllowUserToAddRows = false;
+            this.dgwValues.AllowUserToDeleteRows = false;
+            this.dgwValues.AllowUserToResizeRows = false;
+            this.dgwValues.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dgwValues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgwValues.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1,
             this.Column2,
             this.Column3,
@@ -81,15 +81,16 @@
             this.Column6,
             this.Column7,
             this.Column8});
-            this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
-            this.dataGridView1.MultiSelect = false;
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 125;
-            this.dataGridView1.RowTemplate.Height = 21;
-            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(787, 350);
-            this.dataGridView1.TabIndex = 2;
+            this.dgwValues.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.dgwValues.Location = new System.Drawing.Point(0, 0);
+            this.dgwValues.MultiSelect = false;
+            this.dgwValues.Name = "dgwValues";
+            this.dgwValues.RowHeadersWidth = 125;
+            this.dgwValues.RowTemplate.Height = 21;
+            this.dgwValues.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dgwValues.Size = new System.Drawing.Size(787, 350);
+            this.dgwValues.TabIndex = 2;
+            this.dgwValues.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgwValues_EditingControlShowing);
             // 
             // Column1
             // 
@@ -145,7 +146,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(787, 383);
             this.ControlBox = false;
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.dgwValues);
             this.Controls.Add(this.btnCansel);
             this.Controls.Add(this.btnOK);
             this.Name = "FrmConfigValue";
@@ -153,7 +154,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "価格設定";
             this.Load += new System.EventHandler(this.FrmConfigValue_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgwValues)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -162,7 +163,7 @@
 
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCansel;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dgwValues;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
