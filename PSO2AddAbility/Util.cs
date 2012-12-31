@@ -84,9 +84,10 @@ namespace PSO2AddAbility
         #region +[static]CostToString コストを文字列に
         //-------------------------------------------------------------------------------
         //
-        public static string CostToString(double cost)
+        public static string CostToString(double cost, string format = null)
         {
-            return Double.IsNaN(cost) ? "コスト不明" : ((long)cost).ToString() + "メセタ";
+            string str = (format != null) ? ((long)cost).ToString(format) : ((long)cost).ToString();
+            return Double.IsNaN(cost) ? "コスト不明" : str + "メセタ";
         }
         #endregion (CostToString)
 
@@ -111,5 +112,31 @@ namespace PSO2AddAbility
             //scr.Value = value; // 2回しないとなぜか反応しない
         }
         #endregion (ScrollDelta)
+
+        //-------------------------------------------------------------------------------
+        #region +[static]StrToIAbility 文字列をアビリティに
+        //-------------------------------------------------------------------------------
+        //
+        public static IAbility StrToIAbility(string str)
+        {
+            int level = (str.EndsWith("Ⅰ")) ? 1 :
+                        (str.EndsWith("Ⅱ")) ? 2 :
+                        (str.EndsWith("Ⅲ")) ? 3 :
+                        (str.EndsWith("Ⅳ")) ? 4 :
+                        (str.EndsWith("Ⅴ")) ? 5 : 0;
+
+            string ability_str = (level > 0) ? str.Substring(0, str.Length - 1) : str;
+            ability_str = ability_str.Replace("・", ""); 
+            AbilityType type;
+            if (!Enum.TryParse<AbilityType>(ability_str, out type)) { return null; }
+
+            IAbility ab = Data.DIC_ABILITYTYPE_TO_IABILITY[type];
+
+            if (level > 0) {
+                return (ab as ILevel).GetInstanceOfLv(level);
+            }
+            else { return ab; }
+        }
+        #endregion (StrToIAbility)
     }
 }

@@ -366,11 +366,14 @@ namespace PSO2AddAbility
         public static スピリタ・ブースト Get() { return value; }
     }
     //-------------------------------------------------------------------------------
-    public class ミューテーションⅠ : Special_up
+    public class ミューテーション : Special_up, ILevel
     {
-        private ミューテーションⅠ() { }
-        private static ミューテーションⅠ value = new ミューテーションⅠ();
-        public static ミューテーションⅠ Get() { return value; }
+        private ミューテーション(int lv) { Level = lv; }
+        public int Level { get; protected set; }
+        private static ミューテーション[] values = new ミューテーション[] { null, new ミューテーション(1) };
+        public static ミューテーション GetLv(int lv) { return values[lv]; }
+        public IAbility GetInstanceOfLv(int lv) { return values[lv]; }
+        public IEnumerable<int> AllLevels() { return Enumerable.Range(1, 1); }
     }
     public class スティグマ : Special_up
     {

@@ -120,23 +120,24 @@ namespace PSO2AddAbility
         //
         private void displayWeaponSynthesisDynamically(TreeNode parent_node, SynthesisWeapons[] synthesisweapons)
         {
-            var nodes = synthesisweapons.Select((sw, i) =>
+            var nodes = synthesisweapons.OrderBy(wep => wep.cost)
+                                        .Select((sw, i) =>
             {
-                var tn = new TreeNode(string.Format("case{0} 【{1}】 {2} {3}", i + 1, Util.CostToString(sw.cost), Util.ProbabilityToString(sw.probabilities.Aggregate(1.0f, (f1, f2) => f1 * f2)), sw.probabilities.Select(Util.ProbabilityToString).ToArray().AllToString('[', ']')));
+                var tn = new TreeNode(string.Format("case{0} 【{1}】 {2} {3}", i + 1, Util.CostToString(sw.cost, "N0"), Util.ProbabilityToString(sw.probabilities.Aggregate(1.0f, (f1, f2) => f1 * f2)), sw.probabilities.Select(Util.ProbabilityToString).ToArray().AllToString('[', ']')));
                 List<TreeNode> nodeList = new List<TreeNode>();
 
-                TreeNode node0 = new TreeNode(string.Format("{0} 【{1}】", sw.info0.Weapon.ToString(), Util.CostToString(sw.info0.Cost)));
+                TreeNode node0 = new TreeNode(string.Format("{0} 【{1}】", sw.info0.Weapon.ToString(), Util.CostToString(sw.info0.Cost, "N0")));
                 node0.Tag = new NodeInfo() { synthesisWeapons = sw.info0.SynthesisInfo };
                 if (sw.info0.SynthesisInfo != null) { node0.Nodes.Add(""); } // Expandできるようにダミーノード追加
                 nodeList.Add(node0);
 
-                TreeNode node1 = new TreeNode(string.Format("{0} 【{1}】", sw.info1.Weapon.ToString(), Util.CostToString(sw.info1.Cost)));
+                TreeNode node1 = new TreeNode(string.Format("{0} 【{1}】", sw.info1.Weapon.ToString(), Util.CostToString(sw.info1.Cost, "N0")));
                 node1.Tag = new NodeInfo() { synthesisWeapons = sw.info1.SynthesisInfo };
                 if (sw.info1.SynthesisInfo != null) { node1.Nodes.Add(""); } // Expandできるようにダミーノード追加
                 nodeList.Add(node1);
 
                 if (sw.info2 != null) {
-                    TreeNode node2 = new TreeNode(string.Format("{0} 【{1}】", sw.info2.Weapon.ToString(), Util.CostToString(sw.info2.Cost)));
+                    TreeNode node2 = new TreeNode(string.Format("{0} 【{1}】", sw.info2.Weapon.ToString(), Util.CostToString(sw.info2.Cost, "N0")));
                     node2.Tag = new NodeInfo() { synthesisWeapons = sw.info2.SynthesisInfo };
                     if (sw.info2.SynthesisInfo != null) { node2.Nodes.Add(""); } // Expandできるようにダミーノード追加
                     nodeList.Add(node2);

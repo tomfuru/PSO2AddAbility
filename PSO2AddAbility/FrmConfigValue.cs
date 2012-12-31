@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,15 @@ namespace PSO2AddAbility
         }
         //-------------------------------------------------------------------------------
         #endregion (Constructor)
+
+        //-------------------------------------------------------------------------------
+        #region Constatnts
+        //-------------------------------------------------------------------------------
+        private const string CSV_Filter = "CSVファイル(*.csv)|*.csv";
+        private const char COMMA_C = ',';
+        private const string COMMA = ",";
+        //-------------------------------------------------------------------------------
+        #endregion (Constatnts)
 
         //-------------------------------------------------------------------------------
         #region FrmConfigValue_Load
@@ -71,6 +81,71 @@ namespace PSO2AddAbility
         #endregion (btnCansel_Click)
 
         //-------------------------------------------------------------------------------
+        #region btnReadFile_Click
+        //-------------------------------------------------------------------------------
+        //
+        private void btnReadFile_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog()) {
+                ofd.Filter = CSV_Filter;
+                ofd.InitialDirectory = Environment.CurrentDirectory;
+                if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                    try {
+                        var values = ReadFromFile(ofd.FileName);
+                        // データ更新
+                        if (values != null) {
+                            dgvValues.Rows
+                                     .Cast<DataGridViewRow>()
+                                     .ToList()
+                                     .ForEach(row =>
+                                     {
+                                         IAbility ability = row.Tag as IAbility;
+                                         if (values.ContainsKey(ability)) {
+                                             row.SetValues(values[ability].Select(i => (object)i).ToArray());
+                                         }
+                                     });
+                        }
+
+                        MessageBox.Show("読込完了しました。", Application.ProductName);
+                    }
+                    catch (Exception) {
+                        MessageBox.Show("読込に失敗しました。。", Application.ProductName);
+                    }
+                }
+            }
+        }
+        #endregion (btnReadFile_Click)
+        //-------------------------------------------------------------------------------
+        #region btnWriteFile_Click
+        //-------------------------------------------------------------------------------
+        //
+        private void btnWriteFile_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog sfd = new SaveFileDialog()) {
+                sfd.Filter = CSV_Filter;
+                sfd.InitialDirectory = Environment.CurrentDirectory;
+                if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                    try {
+                        Dictionary<IAbility, int[]> valueDic = new Dictionary<IAbility, int[]>();
+
+                        dgvValues.Rows.OfType<DataGridViewRow>()
+                                      .Select(row => new KeyValuePair<IAbility, int[]>(row.Tag as IAbility, GetRowIntValues(row)))
+                                      .ToList()
+                                      .ForEach(kvp => valueDic.Add(kvp.Key, kvp.Value));
+
+                        WriteToFile(sfd.FileName, valueDic);
+
+                        MessageBox.Show("保存完了しました。", Application.ProductName);
+                    }
+                    catch (Exception) {
+                        MessageBox.Show("保存に失敗しました。", Application.ProductName);
+                    }
+                }
+            }
+        }
+        #endregion (btnWriteFile_Click)
+
+        //-------------------------------------------------------------------------------
         #region -DisplayAllItems
         //-------------------------------------------------------------------------------
         //
@@ -82,37 +157,26 @@ namespace PSO2AddAbility
                 row.HeaderCell.Value = text;
                 object[] vals__ = vals.Skip(1).Select(i => (object)i).ToArray();
                 //row.SetValues(vals__);
-                int index = dgwValues.Rows.Add(row);
-                dgwValues.Rows[index].SetValues(vals__);
-                dgwValues.Rows[index].Tag = ab;
+                int index = dgvValues.Rows.Add(row);
+                dgvValues.Rows[index].SetValues(vals__);
+                dgvValues.Rows[index].Tag = ab;
             };
-            Action<IAbility> append_default = ab => append_values(ab, ab.ToString(), new int[] { 0, 1050, 1050, 1050, 1050, 1050, 1050, 1050, 1050 });
+            Action<IAbility> append_default = ab => append_values(ab, ab.ToString(), new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
             // ゴミだけ
             append_values(ゴミ.Get(), "", _valuedata.GarbageValues);
 
             // 特定アビリティ1つ付き
             var dic = _valuedata.ValueDataDic;
-            foreach (var ab in Data.ALL_ABILITIES) {
+            foreach (var ab in Data.GetAllAbilitiesIncludedLevel()) {
                 AbilityType type = Data.DIC_IABILITY_TO_ABILITYTYPE[ab];
-                if (ab is ILevel) {
-                    ILevel ab_lv = ab as ILevel;
-                    int max_level = ab_lv.AllLevels().Count();
-                    for (int i = 1; i <= max_level; i++) {
-                        if (dic.ContainsKey(SerializableTuple.Create(type, i))) {
-                            append_values(ab_lv.GetInstanceOfLv(i), ab_lv.GetInstanceOfLv(i).ToString(), dic[SerializableTuple.Create(type, i)]);
-                        }
-                        else { append_default(ab_lv.GetInstanceOfLv(i)); }
-                    }
-                }
-                else {
-                    if (dic.ContainsKey(SerializableTuple.Create(type, 0))) {
-                        append_values(ab, ab.ToString(), dic[SerializableTuple.Create(type, 0)]);
-                    }
-                    else { append_default(ab); }
-                }
-            }
+                int level = (ab is ILevel) ? (ab as ILevel).Level : 0;
 
+                if (dic.ContainsKey(SerializableTuple.Create(type, level))) {
+                    append_values(ab, ab.ToString(), dic[SerializableTuple.Create(type, level)]);
+                }
+                else { append_default(ab); }
+            }
         }
         #endregion (DisplayAllItems)
         //-------------------------------------------------------------------------------
@@ -121,11 +185,9 @@ namespace PSO2AddAbility
         //
         private void ExtractAndSetAllItems()
         {
-            foreach (DataGridViewRow row in dgwValues.Rows) {
+            foreach (DataGridViewRow row in dgvValues.Rows) {
                 int[] values = new int[9];
-                int[] input_values = row.Cells.Cast<DataGridViewCell>()
-                                              .Select(dgc => (dgc.Value is int) ? (int)dgc.Value : (dgc.Value is string) ? int.Parse((string)dgc.Value) : 0)
-                                              .ToArray();
+                int[] input_values = GetRowIntValues(row);
                 Array.Copy(input_values, 0, values, 1, 8);
 
                 if (row.Tag is ゴミ) {
@@ -179,6 +241,62 @@ namespace PSO2AddAbility
             }
         }
         #endregion (DGVTextbox_Keypress)
+
+        //-------------------------------------------------------------------------------
+        #region -ReadFromFile ファイルからデータを読み込んで設定
+        //-------------------------------------------------------------------------------
+        //
+        private Dictionary<IAbility, int[]> ReadFromFile(string filePath)
+        {
+            using (StreamReader sr = new StreamReader(filePath)) {
+                sr.ReadLine();
+
+                var dic = new Dictionary<IAbility, int[]>();
+                while (!sr.EndOfStream) {
+                    string[] values_str = sr.ReadLine().Split(COMMA_C);
+                    IAbility ability = Util.StrToIAbility(values_str[0]);
+                    int[] values = values_str.Skip(1).Select(val => int.Parse(val)).ToArray();
+
+                    dic.Add(ability, values);
+                }
+
+                return dic;
+            }
+        }
+        #endregion (ReadFromFile)
+        //-------------------------------------------------------------------------------
+        #region -WriteToFile ファイルにデータを書き込む
+        //-------------------------------------------------------------------------------
+        //
+        private void WriteToFile(string filePath, Dictionary<IAbility, int[]> valueDic)
+        {
+            using (StreamWriter sw = new StreamWriter(filePath)) {
+                sw.WriteLine(Enumerable.Range(1, 8).Select(i => string.Format(",Slot{0}", i)).Aggregate("", (s1, s2) => s1 + s2));
+
+                Data.GetAllAbilitiesIncludedLevel()
+                    .ToList()
+                    .ForEach(iab =>
+                    {
+                        sw.Write(iab.ToString());
+                        sw.Write(COMMA_C);
+                        sw.Write(string.Join(COMMA, valueDic[iab].Select(val => val.ToString())));
+                        sw.WriteLine();
+                    });
+            }
+        }
+        #endregion (WriteToFile)
+
+        //-------------------------------------------------------------------------------
+        #region -GetRowIntValues 整数値としてデータを取得
+        //-------------------------------------------------------------------------------
+        //
+        private int[] GetRowIntValues(DataGridViewRow row)
+        {
+            return row.Cells.Cast<DataGridViewCell>()
+                            .Select(dgc => (dgc.Value is int) ? (int)dgc.Value : (dgc.Value is string) ? int.Parse((string)dgc.Value) : 0)
+                            .ToArray();
+        }
+        #endregion (GetRowIntValues)
     }
 
     //-------------------------------------------------------------------------------
@@ -196,7 +314,7 @@ namespace PSO2AddAbility
         /// <summary>
         /// <para>ゴミだけのアビリティを持つ武器の価値</para>
         /// </summary>
-        public int[] GarbageValues = new int[] { 0, 1050, 1050, 1050, 1050, 1050, 1050, 1050, 1050 };
+        public int[] GarbageValues = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0};
     }
     //-------------------------------------------------------------------------------
     #endregion (ValueData)

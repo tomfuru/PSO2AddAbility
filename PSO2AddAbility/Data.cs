@@ -27,7 +27,7 @@ namespace PSO2AddAbility
 
         アビリティ,
 
-        ミューテーションⅠ,
+        ミューテーション,
         ヴォルソール, グワナソール, クォーツソール,
         ランサソール, ファングソール, マイザーソール,
         ラグネソール,
@@ -100,7 +100,7 @@ namespace PSO2AddAbility
             
                 { アビリティ.GetLv(1), AbilityType.アビリティ },
 
-                { ミューテーションⅠ.Get(), AbilityType.ミューテーションⅠ },
+                { ミューテーション.GetLv(1), AbilityType.ミューテーション },
                 { ヴォル・ソール.Get(), AbilityType.ヴォルソール }, { グワナ・ソール.Get(), AbilityType.グワナソール }, { クォーツ・ソール.Get(), AbilityType.クォーツソール }, 
                 { ランサ・ソール.Get(), AbilityType.ランサソール }, { ファング・ソール.Get(), AbilityType.ファングソール }, { マイザー・ソール.Get(), AbilityType.マイザーソール },
                 { ラグネ・ソール.Get(), AbilityType.ラグネソール }, 
@@ -124,9 +124,40 @@ namespace PSO2AddAbility
             DIC_ABILITYTYPE_TO_IABILITY = new Dictionary<AbilityType, IAbility>();
             DIC_IABILITY_TO_ABILITYTYPE.ToList().ForEach(kvp => DIC_ABILITYTYPE_TO_IABILITY.Add(kvp.Value, kvp.Key));
 
+            // LV2以上のものを追加
+            DIC_IABILITY_TO_ABILITYTYPE
+                .Where(kvp => kvp.Key is ILevel)
+                .ToList()
+                .ForEach(kvp =>
+                {
+                    ILevel ab_lv = kvp.Key as ILevel;
+                    ab_lv.AllLevels()
+                            .ToList()
+                            .ForEach(level =>
+                            {
+                                IAbility ab = ab_lv.GetInstanceOfLv(level);
+                                if (!DIC_IABILITY_TO_ABILITYTYPE.ContainsKey(ab)) {
+                                    DIC_IABILITY_TO_ABILITYTYPE.Add(ab, kvp.Value);
+                                }
+                            });
+                });
+
             ALL_ABILITIES = Enum.GetValues(typeof(AbilityType)).Cast<AbilityType>().Select(type => DIC_ABILITYTYPE_TO_IABILITY[type]).ToArray();
         }
         #endregion (static Constructor)
+
+        //-------------------------------------------------------------------------------
+        #region +[static]GetAllAbilitiesIncludedLevel レベルも考慮した全アビリティの列挙
+        //-------------------------------------------------------------------------------
+        //
+        public static IEnumerable<IAbility> GetAllAbilitiesIncludedLevel()
+        {
+            return Data.ALL_ABILITIES.SelectMany(ab =>
+                (ab is ILevel) ? (ab as ILevel).AllLevels().Select(i => (ab as ILevel).GetInstanceOfLv(i))
+                               : new IAbility[] { ab }
+            );
+        }
+        #endregion (GetAllAbilitiesIncludedLevel)
 
 
         public const int GEN_SP = 0;
