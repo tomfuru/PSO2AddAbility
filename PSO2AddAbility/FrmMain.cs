@@ -27,6 +27,9 @@ namespace PSO2AddAbility
 
             tsslText.Text = tsslSynthesisNumber.Text = "";
             _settings = SettingsData.Restore(SETTINGS_FILENAME) ?? new SettingsData();
+
+            numSynFee2.Value = _settings.Synthesis_2weapons;
+            numSynFee3.Value = _settings.Synthesis_3weapons;
         }
         #endregion (Constructor)
 
@@ -36,6 +39,9 @@ namespace PSO2AddAbility
         //
         private void FrmMain_FormClosed(object sender, FormClosedEventArgs e)
         {
+            _settings.Synthesis_2weapons = (int)numSynFee2.Value;
+            _settings.Synthesis_3weapons = (int)numSynFee3.Value;
+
             _settings.Save(SETTINGS_FILENAME);
         }
         #endregion (FrmMain_FormClosed)

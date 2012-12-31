@@ -57,7 +57,6 @@ namespace PSO2AddAbility
             vscrPanel.Maximum = pnlDisp.Height - defHeight;
             vscrPanel.LargeChange = defHeight - 11;
             vscrPanel.SmallChange = 11;
-
         }
         //-------------------------------------------------------------------------------
         #endregion (Constructor)
@@ -93,7 +92,8 @@ namespace PSO2AddAbility
         //
         public IEnumerable<IAbility> GetAbilities()
         {
-            throw new NotImplementedException();
+            return _checkboxes.Where(chb => chb.Checked)
+                              .Select(chb => chb.Tag as IAbility);
         }
         #endregion (GetAbilities)
         //-------------------------------------------------------------------------------
@@ -102,27 +102,47 @@ namespace PSO2AddAbility
         //
         public void SetAbilities(IAbility[] abilities)
         {
-            throw new NotImplementedException();
+            foreach (var chb in _checkboxes) {
+                var ab = chb.Tag as IAbility; 
+                chb.Checked = abilities.Contains(ab);
+            }
         }
         #endregion (SetAbilities)
 
+        //-------------------------------------------------------------------------------
+        #region WeaponAbilityInputCheckBox_Load
+        //-------------------------------------------------------------------------------
+        //
         private void WeaponAbilityInputCheckBox_Load(object sender, EventArgs e)
         {
-            this.TopLevelControl.MouseWheel += (obj, ee) => {
-                int change = -ee.Delta / 120 * MARGIN_Y * 2;
-                vscrPanel.ScrollDelta(change);
-            };
+            if (this.TopLevelControl != null) {
+                this.TopLevelControl.MouseWheel += (obj, ee) =>
+                {
+                    int change = -ee.Delta / 120 * MARGIN_Y * 2;
+                    vscrPanel.ScrollDelta(change);
+                };
+            }
         }
+        #endregion (WeaponAbilityInputCheckBox_Load)
 
+        //-------------------------------------------------------------------------------
+        #region vscrPanel_Scroll
+        //-------------------------------------------------------------------------------
+        //
         private void vscrPanel_Scroll(object sender, ScrollEventArgs e)
         {
             vscrPanel.Value = e.NewValue;
         }
-
+        #endregion (vscrPanel_Scroll)
+        //-------------------------------------------------------------------------------
+        #region vscrPanel_ValueChanged
+        //-------------------------------------------------------------------------------
+        //
         private void vscrPanel_ValueChanged(object sender, EventArgs e)
         {
-           pnlDisp.Top = -vscrPanel.Value;
+            pnlDisp.Top = -vscrPanel.Value;
         }
+        #endregion (vscrPanel_ValueChanged)
 
     }
 }
