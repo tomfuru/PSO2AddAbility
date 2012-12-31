@@ -98,6 +98,7 @@ namespace PSO2AddAbility
         /// <summary>メモ化用キャッシュ</summary>
         //private static Dictionary<Weapon, SynthesisWeapons[]> winfo_cache = new Dictionary<Weapon, SynthesisWeapons[]>();
         private static ConcurrentDictionary<Weapon, SynthesisWeapons[]> winfo_cache = new ConcurrentDictionary<Weapon, SynthesisWeapons[]>();
+        private static ConcurrentDictionary<Weapon, SynthesisWeapons[]> winfo_cache_material = new ConcurrentDictionary<Weapon, SynthesisWeapons[]>();
         //-------------------------------------------------------------------------------
         #region +Synthesize
         //-------------------------------------------------------------------------------
@@ -113,16 +114,25 @@ namespace PSO2AddAbility
         //
         private static SynthesisWeapons[] SynthesizeInternal(Weapon objective, bool isMaterial, bool isParallel, SynthesisGeneralInfo synInfo, Action<int> reportCombNum, Action reportFinOneComb, bool isTopLevel)
         {
-            if (winfo_cache.ContainsKey(objective)) { // 今まであったものなら参照
-                return winfo_cache[objective];
-            }
-            else if (IsBasicWeapon(objective, isMaterial)) { // BasicWeaponならそれ以上探さない
+            if (IsBasicWeapon(objective, isMaterial)) { // BasicWeaponならそれ以上探さない
                 return null;
             }
-            else if (objective.All(iab => iab is ゴミ)) {
-                return SynthesizeToIncreaseSlotNum(objective, synInfo);
-            }
 
+            if (isMaterial) {
+                // 素材武器のみ
+                if (winfo_cache_material.ContainsKey(objective)) { // 今まであったものなら参照
+                    return winfo_cache_material[objective];
+                }
+            }
+            else {
+                // 素材武器でないメイン武器
+                if (winfo_cache.ContainsKey(objective)) { // 今まであったものなら参照
+                    return winfo_cache[objective];
+                }
+                else if (objective.All(iab => iab is ゴミ)) { // ゴミだけならそれに特化したメソッド
+                    return SynthesizeToIncreaseSlotNum(objective, synInfo);
+                }
+            }
             int num_slot = objective.AbilityNum;
             // 必要な素材能力の候補リストを取得
             var need_materials = objective.Where(iab => !(iab is ゴミ)).Select(Data.GetMaterialAbilities).ToArray();
@@ -172,17 +182,17 @@ namespace PSO2AddAbility
 
                     WeaponSynthesisInfo info0 = new WeaponSynthesisInfo() {
                         Weapon = combweapon[0],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[0], false)) ? null : SynthesizeInternal(combweapon[0], false, false, synInfo, reportCombNum, reportFinOneComb, false)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[0], isMaterial)) ? null : SynthesizeInternal(combweapon[0], isMaterial, false, synInfo, reportCombNum, reportFinOneComb, false)
                     };
                     info0.Cost = GetCostOfWeapon(info0.Weapon, info0.SynthesisInfo, synInfo);
                     WeaponSynthesisInfo info1 = new WeaponSynthesisInfo() {
                         Weapon = combweapon[1],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[1], true)) ? null : SynthesizeInternal(combweapon[1], true, false, synInfo, reportCombNum, reportFinOneComb, false)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[1], false)) ? null : SynthesizeInternal(combweapon[1], true, false, synInfo, reportCombNum, reportFinOneComb, false)
                     };
                     info1.Cost = GetCostOfWeapon(info1.Weapon, info1.SynthesisInfo, synInfo);
                     WeaponSynthesisInfo info2 = (three_weapons) ? new WeaponSynthesisInfo() {
                         Weapon = combweapon[2],
-                        SynthesisInfo = (IsBasicWeapon(combweapon[2], true)) ? null : SynthesizeInternal(combweapon[2], true, false, synInfo, reportCombNum, reportFinOneComb, false)
+                        SynthesisInfo = (IsBasicWeapon(combweapon[2], false)) ? null : SynthesizeInternal(combweapon[2], true, false, synInfo, reportCombNum, reportFinOneComb, false)
                     }
                     : null;
                     if (info2 != null) { info2.Cost = GetCostOfWeapon(info2.Weapon, info2.SynthesisInfo, synInfo); }
@@ -230,9 +240,10 @@ namespace PSO2AddAbility
             }
 
             SynthesisWeapons[] ret = sw_list.ToArray();
-            if (!winfo_cache.ContainsKey(objective)) {
-                //winfo_cache.Add(objective, ret);
-                winfo_cache.TryAdd(objective, ret);
+
+            var dic = (isMaterial) ? winfo_cache_material : winfo_cache;
+            if (!dic.ContainsKey(objective)) {
+                dic.TryAdd(objective, ret);
             }
 
             return ret;
@@ -359,15 +370,15 @@ namespace PSO2AddAbility
         //
         public static bool IsBasicWeapon(Weapon weapon, bool isMaterial)
         {
-            int garbage_num = weapon.Count(ab => ab is ゴミ);
-
             if (isMaterial) {
-                if (garbage_num >= weapon.AbilityNum - 1) { return true; }
+                // Material weapon
+                int garbage_num = weapon.Count(ab => ab is ゴミ);
+                return (garbage_num >= weapon.AbilityNum - 1);
             }
             else {
-                if (weapon.AbilityNum == 0) { return true; }
+                // Main weapon
+                return (weapon.AbilityNum == 0);
             }
-            return false;
         }
         #endregion (IsBasicWeapon)
 
@@ -461,7 +472,7 @@ namespace PSO2AddAbility
             }
             else if (objective is Basic_up || objective is Additional) {
                 ILevel ab_lv = objective as ILevel;
-                bool mutation_amp = (objective is IMutationAmplifiable) && weapons.Any(weapon => weapon.ContainsAbility(ミューテーションⅠ.Get()));
+                bool mutation_amp = (objective is IMutationAmplifiable) && weapons.Any(weapon => weapon.ContainsAbility(ミューテーション.GetLv(1)));
                 bool soul_amp = !mutation_amp && weapons.Any(weapon => weapon.Any(ab => ab is Soul && (ab as Soul).IsAmplifiableAbility(objective))); // !mutation_ampはミューテーションによる増加がある場合はソールについて調べる必要がない為
 
                 float[,] prob_table = PROB_TABLE[(objective is Basic_up) ? 0 : 1, (mutation_amp) ? 2 : (soul_amp) ? 1 : 0];
